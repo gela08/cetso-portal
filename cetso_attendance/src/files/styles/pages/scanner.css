@@ -1,0 +1,86 @@
+.scanner-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .scanner-container { grid-template-columns: 1fr; }
+}
+
+.scanner-controls {
+  background: var(--cetso-white);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.scan-form {
+  display: flex;
+  gap: 10px;
+  margin: 2rem 0;
+}
+
+.scan-form input {
+  flex: 1;
+  font-size: 1.2rem;
+  padding: 1rem;
+  border: 2px solid var(--cetso-orange);
+}
+
+.scan-form button {
+  background: var(--cetso-black);
+  color: white;
+  padding: 0 2rem;
+  font-weight: bold;
+}
+
+.result-card {
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.result-card.success {
+  background-color: #d1fae5;
+  border: 2px solid var(--status-green);
+  color: #065f46;
+}
+
+.result-card.error {
+  background-color: #fee2e2;
+  border: 2px solid var(--status-red);
+  color: #991b1b;
+}
+
+.student-details {
+  margin-top: 1.5rem;
+  background: rgba(255,255,255,0.6);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+}
+
+.avatar-placeholder {
+  width: 60px;
+  height: 60px;
+  background: var(--cetso-orange);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
