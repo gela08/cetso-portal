@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './files/components/Navbar';
 import PublicPage from './files/pages/PublicPage';
 import ScannerPage from './files/pages/ScannerPage';
-import './app.css';
+import './App.css';
 
 import { calculateSanctions, type SanctionRule } from './files/utils/SanctionLogic';
 import Footer from './files/components/Footer';
