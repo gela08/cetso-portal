@@ -13,16 +13,20 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, user, logout }) =
 
   return (
     <nav className="navbar">
-      <div className="nav-brand" onClick={() => setView('public')} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <img 
-          src={logoUrl} 
-          alt="CETSO Logo" 
-          style={{ width: '35px', height: '35px', borderRadius: '50%' }} 
-        />
-        <div>
-          <span className="brand-orange">CETSO</span> Portal
-        </div>
-      </div>
+      <div className="nav-brand" onClick={() => setView('public')}>
+  <img 
+    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXNNzF_cV5B_i5H3q8JzjvnJWNOSKfPzsJ5w&s" 
+    alt="CETSO Logo" 
+    style={{ 
+      borderRadius: '50%', // Makes it a circle
+      width: '40px', 
+      height: '40px', 
+      objectFit: 'cover', // Prevents stretching
+      border: '2px solid #ff6600' // Optional: adds an orange ring
+    }} 
+  />
+  <span className="brand-orange" style={{ marginLeft: '10px' }}>CETSO</span> Portal
+</div>
 
       <div className="nav-links">
         {/* Public View Button */}

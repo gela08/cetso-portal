@@ -68,3 +68,14 @@
 .btn-logout:hover {
   background-color: #b91c1c !important;
 }
+
+
+.nav-logo {
+  width: 40px;
+  height: 40px;
+  /* This makes the image a perfect circle */
+  border-radius: 50%; 
+  /* This ensures the image doesn't stretch */
+  object-fit: cover; 
+  border: 2px solid var(--cetso-orange);
+}
