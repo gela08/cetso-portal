@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/pages/scanner.css';
 
-// Mock Data Types
+// Types matches App.tsx
 interface Student {
   id: string;
   name: string;
@@ -16,14 +16,16 @@ interface ScannerPageProps {
 const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
   const [inputId, setInputId] = useState('');
   const [lastScan, setLastScan] = useState<{status: string, msg: string, student?: Student} | null>(null);
-  const [scanMode, setScanMode] = useState('AM_IN'); // AM_IN, AM_OUT, PM_IN, PM_OUT
   
-  // Auto-focus input for barcode scanner
+  // States for the new Button Selection
+  const [eventMode, setEventMode] = useState('Intramurals'); 
+  const [sessionTime, setSessionTime] = useState('AM_IN');
+
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Auto-focus input for barcode scanner
   useEffect(() => {
     inputRef.current?.focus();
-    // Re-focus listener for clicking away
     const handleBlur = () => setTimeout(() => inputRef.current?.focus(), 100);
     window.addEventListener('click', handleBlur);
     return () => window.removeEventListener('click', handleBlur);
@@ -33,7 +35,10 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
     e.preventDefault();
     if (!inputId) return;
 
-    const result = onRecordAttendance(inputId, scanMode);
+    // We pass a combined string so App.tsx logic knows which event and time it is
+    // Example: "Intramurals AM_IN"
+    const combinedType = `${eventMode} ${sessionTime}`;
+    const result = onRecordAttendance(inputId, combinedType);
     
     setLastScan({
       status: result.success ? 'success' : 'error',
@@ -41,7 +46,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
       student: result.student
     });
 
-    setInputId(''); // Clear for next scan
+    setInputId(''); 
   };
 
   return (
@@ -49,14 +54,43 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
       <div className="scanner-controls">
         <h2>Attendance Scanner</h2>
         
-        <div className="mode-selector">
-          <label>Session Mode:</label>
-          <select value={scanMode} onChange={(e) => setScanMode(e.target.value)}>
-            <option value="AM_IN">Morning IN</option>
-            <option value="AM_OUT">Morning OUT</option>
-            <option value="PM_IN">Afternoon IN</option>
-            <option value="PM_OUT">Afternoon OUT</option>
-          </select>
+        {/* Event Selection Buttons */}
+        <div className="mode-section">
+          <label className="section-label">Select Event:</label>
+          <div className="button-grid">
+            {['Intramurals', 'Orientation'].map((ev) => (
+              <button 
+                key={ev}
+                type="button"
+                className={`mode-btn ${eventMode === ev ? 'active' : ''}`}
+                onClick={() => setEventMode(ev)}
+              >
+                {ev}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Session Selection Buttons */}
+        <div className="mode-section">
+          <label className="section-label">Session Time:</label>
+          <div className="button-grid">
+            {[
+              { id: 'AM_IN', label: 'Morning IN' },
+              { id: 'AM_OUT', label: 'Morning OUT' },
+              { id: 'PM_IN', label: 'Afternoon IN' },
+              { id: 'PM_OUT', label: 'Afternoon OUT' }
+            ].map((opt) => (
+              <button 
+                key={opt.id}
+                type="button"
+                className={`mode-btn ${sessionTime === opt.id ? 'active' : ''}`}
+                onClick={() => setSessionTime(opt.id)}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <form onSubmit={handleScan} className="scan-form">
@@ -65,14 +99,15 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
             type="text" 
             value={inputId}
             onChange={(e) => setInputId(e.target.value)}
-            placeholder="Scan Barcode or Type ID..."
+            placeholder="Scan Barcode..."
             autoComplete="off"
           />
           <button type="submit">Submit</button>
         </form>
 
         <div className="scan-instructions">
-          <p>Scanner is <strong>READY</strong>. Click anywhere to refocus.</p>
+          <p>Ready for: <strong>{eventMode}</strong> ({sessionTime.replace('_', ' ')})</p>
+          <small>Click anywhere to refocus the scanner.</small>
         </div>
       </div>
 
@@ -84,7 +119,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
             {lastScan.student && (
               <div className="student-details">
                 <div className="avatar-placeholder">ID</div>
-                <div>
+                <div className="student-info">
                   <h4>{lastScan.student.name}</h4>
                   <p>{lastScan.student.program}</p>
                   <span className="id-badge">{lastScan.student.id}</span>
@@ -94,7 +129,8 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
           </div>
         ) : (
           <div className="waiting-state">
-            Waiting for input...
+            <div className="pulse"></div>
+            <p>Waiting for scan...</p>
           </div>
         )}
       </div>
