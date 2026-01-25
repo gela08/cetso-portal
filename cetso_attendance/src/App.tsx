@@ -9,8 +9,8 @@ import Footer from './files/components/Footer';
 
 // --- DATABASE: STUDENTS ---
 const INITIAL_STUDENTS = [
-  { id: '2023001', name: 'Juan Dela Cruz', program: 'BSIT', year: '3' },
-  { id: '2023002', name: 'Maria Santos', program: 'BSCpE', year: '2' },
+  { id: '2023001', name: 'Jerome Sagunday', program: 'BSIT', year: '3' },
+  { id: '2023002', name: 'We Miss You Jerome', program: 'BSCpE', year: '2' },
   { id: '2023003', name: 'Pedro Penduko', program: 'BSECE', year: '4' },
 ];
 
