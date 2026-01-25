@@ -5,6 +5,7 @@ import ScannerPage from './files/pages/ScannerPage';
 import './app.css';
 
 import { calculateSanctions, type SanctionRule } from './files/utils/SanctionLogic';
+import Footer from './files/components/Footer';
 
 // --- DATABASE: STUDENTS ---
 const INITIAL_STUDENTS = [
@@ -226,6 +227,8 @@ const App = () => {
           </div>
         )}
       </main>
+
+      <Footer />
     </div>
   );
 };
