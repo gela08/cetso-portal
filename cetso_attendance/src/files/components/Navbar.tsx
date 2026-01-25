@@ -9,13 +9,23 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ currentView, setView, user, logout }) => {
+  const logoUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXNNzF_cV5B_i5H3q8JzjvnJWNOSKfPzsJ5w&s";
+
   return (
     <nav className="navbar">
-      <div className="nav-brand" onClick={() => setView('public')}>
-        <span className="brand-orange">CETSO</span> Portal
+      <div className="nav-brand" onClick={() => setView('public')} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <img 
+          src={logoUrl} 
+          alt="CETSO Logo" 
+          style={{ width: '35px', height: '35px', borderRadius: '50%' }} 
+        />
+        <div>
+          <span className="brand-orange">CETSO</span> Portal
+        </div>
       </div>
+
       <div className="nav-links">
-        {/* Public Button */}
+        {/* Public View Button */}
         <button 
           className={currentView === 'public' ? 'active' : ''} 
           onClick={() => setView('public')}
@@ -42,7 +52,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, user, logout }) =
           </>
         ) : (
           <button 
-            className="btn-login" 
+            className={`btn-login ${currentView === 'login' ? 'active' : ''}`} 
             onClick={() => setView('login')}
           >
             Officer Login

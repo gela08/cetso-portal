@@ -1,3 +1,11 @@
+:root {
+  --cetso-orange: #ff6600;
+  --cetso-black: #1a1a1a;
+  --cetso-white: #ffffff;
+  --status-red: #dc2626;
+  --shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
 .navbar {
   background-color: var(--cetso-black);
   color: var(--cetso-white);
@@ -15,6 +23,8 @@
   font-size: 1.5rem;
   font-weight: 800;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 
 .brand-orange {
@@ -23,14 +33,18 @@
 
 .nav-links button {
   background: transparent;
+  border: none;
   color: #ccc;
   font-weight: 600;
   margin-left: 1.5rem;
   padding: 0.5rem 1rem;
   border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.nav-links button:hover, .nav-links button.active {
+.nav-links button:hover, 
+.nav-links button.active {
   color: var(--cetso-white);
   background-color: rgba(255, 255, 255, 0.1);
 }
@@ -40,7 +54,17 @@
   color: var(--cetso-orange) !important;
 }
 
+.btn-login.active {
+  background-color: var(--cetso-orange) !important;
+  color: white !important;
+}
+
 .btn-logout {
   background-color: var(--status-red) !important;
   color: white !important;
+  border: none !important;
+}
+
+.btn-logout:hover {
+  background-color: #b91c1c !important;
 }
