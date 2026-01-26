@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/pages/login.css';
 
 interface LoginPageProps {
   onLoginSuccess: (user: any) => void;
