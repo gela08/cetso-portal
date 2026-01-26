@@ -1,11 +1,47 @@
-import type { SanctionRule } from './SanctionLogic';
+export interface SanctionRule {
+  category: 'Intramurals' | 'Orientation';
+  minAbsences: number;
+  maxAbsences: number;
+  item: string;
+  price: number;
+}
+
 
 // src/utils/Data.ts
 export const INITIAL_STUDENTS = [
-  { id: '123', name: 'Jerome Sagunday', yearLevel: '3rd Year', program: 'BSIT' },
-  { id: '1234', name: 'We Miss You Jerome', yearLevel: '2nd Year', program: 'BSCpE' },
-  { id: '12345', name: 'PAG DALI BA!', yearLevel: '4th Year', program: 'BSECE' },
-  { id: '123456', name: 'Hell Nah Dawg', yearLevel: '1st Year', program: 'BLIS' },
+
+  {
+    id: '2021-0001',
+    firstName: 'Jerome',
+    lastName: 'Sagunday',
+    yearLevel: '3rd Year',
+    program: 'BSIT'
+  },
+
+  {
+    id: '2022-0456',
+    firstName: 'Juan',
+    lastName: 'Dela Cruz',
+    yearLevel: '1st Year',
+    program: 'BSIT'
+  },
+
+  {
+    id: '2023-0123',
+    firstName: 'Maria',
+    lastName: 'Clara',
+    yearLevel: '1st Year',
+    program: 'BSIT'
+  },
+
+  {
+    id: '2021-9999',
+    firstName: 'Tech',
+    lastName: 'Support',
+    yearLevel: '4th Year',
+    program: 'BSCpE'
+  }
+
 ];
 
 // --- DATABASE: SANCTIONS (FOR PUBLIC VIEW) ---

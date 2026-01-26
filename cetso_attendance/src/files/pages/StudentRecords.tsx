@@ -16,13 +16,14 @@ const StudentRecords = ({ students, programFilter }: any) => {
       </div>
       <table className="modern-table">
         <thead>
-          <tr><th>ID</th><th>Name</th><th>Year</th><th>Program</th><th>Actions</th></tr>
+          <tr><th>ID</th><th>Last Name</th><th>First Name</th><th>Year</th><th>Program</th><th>Actions</th></tr>
         </thead>
         <tbody>
           {filtered.map((s: any) => (
             <tr key={s.id}>
               <td className="font-mono">{s.id}</td>
-              <td>{s.name}</td>
+              <td>{s.firstName}</td>
+              <td>{s.lastName}</td>
               <td>{s.yearLevel}</td>
               <td><span className="program-tag">{s.program}</span></td>
               <td>

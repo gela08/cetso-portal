@@ -1,7 +1,25 @@
-export interface SanctionRule {
-  category: string;
-  minAbsences: number;
-  maxAbsences: number;
+import type { SanctionRule } from './Data';
+// src/utils/SanctionLogic.ts
+
+export interface Student {
+  id: string;
+  firstName: string;
+  lastName: string;
+  yearLevel: string;
+  program: string;
+}
+
+export interface AttendanceLog {
+  studentId: string;
+}
+
+export interface SanctionResult {
+  studentId: string;
+  firstName: string;
+  lastName: string;
+  yearLevel: string;
+  program: string;
+  absences: number;
   item: string;
   price: number;
 }
@@ -9,32 +27,31 @@ export interface SanctionRule {
 export const calculateSanctions = (
   students: any[],
   attendance: any[],
-  totalRequiredChecks: number,
+  totalRequired: number,
   rules: SanctionRule[]
 ) => {
-  const sanctionList: any[] = [];
+  return students.map(student => {
+    // Count how many times this student ID appears in attendance logs
+    const logs = attendance.filter(log => log.studentId === student.id);
+    const absences = Math.max(0, totalRequired - logs.length);
 
-  students.forEach((student) => {
-    const studentLogs = attendance.filter((log) => log.studentId === student.id);
-    const absences = Math.max(0, totalRequiredChecks - studentLogs.length);
-
-    // Only process if there is at least one absence
     if (absences > 0) {
-      const assignedRule = rules.find(
-        (rule) => absences >= rule.minAbsences && absences <= rule.maxAbsences
-      );
-
-      if (assignedRule) {
-        sanctionList.push({
-          studentName: student.name,
+      // Find the rule that fits the number of absences
+      const rule = rules.find(r => absences >= r.minAbsences && absences <= r.maxAbsences);
+      
+      if (rule) {
+        return {
+          studentId: student.id,
+          firstName: student.firstName,
+          lastName: student.lastName,
           program: student.program,
-          absences: absences,
-          item: assignedRule.item,
-          price: assignedRule.price,
-        });
+          yearLevel: student.yearLevel,
+          absences,
+          item: rule.item,
+          price: rule.price
+        };
       }
     }
-  });
-
-  return sanctionList;
+    return null;
+  }).filter(item => item !== null); // Remove students with 0 absences
 };

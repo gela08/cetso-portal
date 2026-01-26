@@ -12,7 +12,7 @@ import DashboardPage from './files/pages/Dashboard';
 import { INITIAL_STUDENTS } from './files/utils/Data';
 import './App.css';
 
-// Guard Component
+// Guard Component: Ensures only logged-in users can see specific pages
 const ProtectedRoute = ({ user, children, setView }: any) => {
   useEffect(() => {
     if (!user) setView('login');
@@ -25,40 +25,78 @@ const App = () => {
   const [user, setUser] = useState<any>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
 
-  // Load persistence on mount
+  // Load data from LocalStorage when the app starts
   useEffect(() => {
     const saved = localStorage.getItem('cetso_attendance');
-    if (saved) setAttendance(JSON.parse(saved));
+    if (saved) {
+      try {
+        setAttendance(JSON.parse(saved));
+      } catch (error) {
+        console.error("Failed to parse attendance data", error);
+      }
+    }
   }, []);
 
-  // Save persistence on changes
+  // Automatically save attendance data whenever it changes
   useEffect(() => {
     localStorage.setItem('cetso_attendance', JSON.stringify(attendance));
   }, [attendance]);
 
-  // Shared function for Scanner
+  /**
+   * Main Logic for Recording Attendance
+   * Correctly captures firstName and lastName for the Sanction List
+   */
   const handleRecordAttendance = (studentId: string, type: string) => {
-    const student = INITIAL_STUDENTS.find(s => s.id === studentId);
-    if (!student) return { success: false, msg: `ID ${studentId} not found.` };
+    // Cast INITIAL_STUDENTS as any if TypeScript is still strict about the 'name' field
+    const student = (INITIAL_STUDENTS as any[]).find(s => s.id === studentId);
+    
+    if (!student) {
+      return { success: false, msg: `ID ${studentId} not found in CETSO database.` };
+    }
 
     const today = new Date().toDateString();
+
+    // Prevent duplicate logs for the same student, same type, on the same day
     const duplicate = attendance.find(r =>
-      r.studentId === studentId && r.type === type && new Date(r.timestamp).toDateString() === today
+      r.studentId === studentId && 
+      r.type === type && 
+      new Date(r.timestamp).toDateString() === today
     );
 
-    if (duplicate) return { success: false, msg: `Already recorded ${type} for today.`, student };
+    if (duplicate) {
+      return { 
+        success: false, 
+        msg: `Attendance already recorded for ${student.firstName} today.`, 
+        student 
+      };
+    }
 
+    // Create the new attendance record with updated name fields
     const newRecord = {
       id: Date.now(),
-      studentId,
-      name: student.name,
+      studentId: student.id,
+      firstName: student.firstName, 
+      lastName: student.lastName,  
       program: student.program,
+      yearLevel: student.yearLevel,
       type,
       timestamp: new Date().toISOString()
     };
 
+    // Update state
     setAttendance([newRecord, ...attendance]);
-    return { success: true, msg: `Recorded ${type} for ${student.name}`, student };
+
+    const fullName = `${student.firstName} ${student.lastName}`;
+    return { 
+      success: true, 
+      msg: `Successfully recorded ${type} for ${fullName}`, 
+      student 
+    };
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setView('public');
   };
 
   return (
@@ -67,25 +105,35 @@ const App = () => {
         currentView={view} 
         setView={setView} 
         user={user} 
-        logout={() => { setUser(null); setView('public'); }} 
+        logout={handleLogout} 
       />
 
       <main className="main-content">
         {view === 'public' && <PublicPage />}
         
         {view === 'login' && (
-          <LoginPage onLoginSuccess={(userData) => { setUser(userData); setView('dashboard'); }} />
+          <LoginPage onLoginSuccess={(userData) => { 
+            setUser(userData); 
+            setView('dashboard'); 
+          }} />
         )}
 
         {view === 'scanner' && (
           <ProtectedRoute user={user} setView={setView}>
-            <ScannerPage students={INITIAL_STUDENTS} onRecordAttendance={handleRecordAttendance} />
+            {/* Note: Ensure ScannerPage component also uses split name fields internally */}
+            <ScannerPage 
+              students={INITIAL_STUDENTS as any} 
+              onRecordAttendance={handleRecordAttendance} 
+            />
           </ProtectedRoute>
         )}
 
         {view === 'dashboard' && (
           <ProtectedRoute user={user} setView={setView}>
-            <DashboardPage attendance={attendance} setAttendance={setAttendance} />
+            <DashboardPage 
+              attendance={attendance} 
+              setAttendance={setAttendance} 
+            />
           </ProtectedRoute>
         )}
       </main>

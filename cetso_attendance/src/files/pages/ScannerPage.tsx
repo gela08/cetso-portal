@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/pages/scanner.css';
 
-// Types matches App.tsx
+// Types must match INITIAL_STUDENTS in Data.ts
 interface Student {
   id: string;
-  name: string;
+  firstName: string; 
+  lastName: string;
+  yearLevel: string;
   program: string;
 }
 
@@ -17,13 +19,13 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
   const [inputId, setInputId] = useState('');
   const [lastScan, setLastScan] = useState<{status: string, msg: string, student?: Student} | null>(null);
   
-  // States for the new Button Selection
+  // States for Event and Session selection
   const [eventMode, setEventMode] = useState('Intramurals'); 
   const [sessionTime, setSessionTime] = useState('AM_IN');
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-focus input for barcode scanner
+  // Auto-focus logic for barcode scanners
   useEffect(() => {
     inputRef.current?.focus();
     const handleBlur = () => setTimeout(() => inputRef.current?.focus(), 100);
@@ -35,8 +37,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
     e.preventDefault();
     if (!inputId) return;
 
-    // We pass a combined string so App.tsx logic knows which event and time it is
-    // Example: "Intramurals AM_IN"
+    // Combined type for App.tsx logic
     const combinedType = `${eventMode} ${sessionTime}`;
     const result = onRecordAttendance(inputId, combinedType);
     
@@ -54,7 +55,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
       <div className="scanner-controls">
         <h2>Attendance Scanner</h2>
         
-        {/* Event Selection Buttons */}
+        {/* Event Selection */}
         <div className="mode-section">
           <label className="section-label">Select Event:</label>
           <div className="button-grid">
@@ -71,7 +72,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
           </div>
         </div>
 
-        {/* Session Selection Buttons */}
+        {/* Session Selection */}
         <div className="mode-section">
           <label className="section-label">Session Time:</label>
           <div className="button-grid">
@@ -118,10 +119,13 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
             <p className="scan-msg">{lastScan.msg}</p>
             {lastScan.student && (
               <div className="student-details">
-                <div className="avatar-placeholder">ID</div>
+                <div className="avatar-placeholder">
+                  {lastScan.student.lastName.charAt(0)}
+                </div>
                 <div className="student-info">
-                  <h4>{lastScan.student.name}</h4>
-                  <p>{lastScan.student.program}</p>
+                  {/* FIXED: Displaying split names correctly */}
+                  <h4>{lastScan.student.firstName} {lastScan.student.lastName}</h4>
+                  <p>{lastScan.student.program} — {lastScan.student.yearLevel}</p>
                   <span className="id-badge">{lastScan.student.id}</span>
                 </div>
               </div>
