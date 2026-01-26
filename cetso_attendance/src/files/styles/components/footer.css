@@ -1,0 +1,23 @@
+.portal-footer {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding: 2rem 5%;
+  border-top: 4px solid var(--cetso-orange);
+}
+
+.footer-brand h3 {
+  color: var(--cetso-orange);
+  font-size: 1.4rem;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.dev-name {
+  color: var(--cetso-orange);
+  font-weight: bold;
+}
