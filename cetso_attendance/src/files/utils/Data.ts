@@ -20,24 +20,24 @@ export const INITIAL_STUDENTS = [
 
   {
     id: '2022-0456',
-    firstName: 'Juan',
-    lastName: 'Dela Cruz',
+    firstName: 'You Jerome',
+    lastName: 'We Miss',
     yearLevel: '1st Year',
     program: 'BSIT'
   },
 
   {
     id: '2023-0123',
-    firstName: 'Maria',
-    lastName: 'Clara',
+    firstName: 'NAH',
+    lastName: 'HELL',
     yearLevel: '1st Year',
     program: 'BSIT'
   },
 
   {
     id: '2021-9999',
-    firstName: 'Tech',
-    lastName: 'Support',
+    firstName: 'Way Bro',
+    lastName: 'Aint No',
     yearLevel: '4th Year',
     program: 'BSCpE'
   }
