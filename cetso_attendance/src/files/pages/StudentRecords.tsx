@@ -250,6 +250,7 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
                   <td>{s.yearLevel}</td>
                   <td><span className="program-tag">{s.program}</span></td>
                   <td>
+                    
                     <div className="action-buttons-row">
                       <button className="btn-icon edit" title="Edit" onClick={() => { setSelectedStudent(s); setIsModalOpen(true); }}>
                         <Edit3 size={16} />
@@ -258,6 +259,7 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
                         <Trash2 size={16} />
                       </button>
                     </div>
+
                   </td>
                 </tr>
               ))
