@@ -295,7 +295,9 @@
 }
 
 .btn-icon.edit {
-  background: #eff6ff; /* Soft blue */
+  display: block;
+  padding-left: 10px;
+  background: #eff6ff; 
   color: #2563eb;
 }
 
@@ -305,7 +307,9 @@
 }
 
 .btn-icon.delete {
-  background: #fef2f2; /* Soft red */
+  display: block;
+  padding-left: 10px;
+  background: #fef2f2; 
   color: #dc2626;
 }
 
