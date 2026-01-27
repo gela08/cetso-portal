@@ -22,7 +22,6 @@ interface Props {
 type SortOption = 'lastName' | 'studentId' | 'yearLevel';
 
 const StudentRecords = ({ initialStudents, programFilter }: Props) => {
-  // --- State ---
   const [students, setStudents] = useState<Student[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [yearFilter, setYearFilter] = useState('ALL');
@@ -32,7 +31,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  // --- Effects ---
   useEffect(() => {
     setStudents(initialStudents);
   }, [initialStudents]);
@@ -47,7 +45,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
     setSelectedIds([]);
   }, [searchQuery, yearFilter]);
 
-  // --- Optimization: Memoized Filtering & Sorting ---
   const displayStudents = useMemo(() => {
     const yearWeight: Record<string, number> = {
       '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4
@@ -70,7 +67,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
       });
   }, [students, programFilter, yearFilter, searchQuery, sortBy]);
 
-  // --- Selection Handlers ---
   const toggleSelectAll = () => {
     if (selectedIds.length === displayStudents.length && displayStudents.length > 0) {
       setSelectedIds([]);
@@ -85,13 +81,9 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
     );
   };
 
-  // --- Action Handlers ---
   const handleExportCSV = () => {
     if (displayStudents.length === 0) return alert("No data to export");
-    
-    // Helper to escape commas and quotes for CSV
     const safeCSV = (str: string | number) => `"${String(str).replace(/"/g, '""')}"`;
-
     const headers = ["Student ID", "Last Name", "First Name", "Year Level", "Program"];
     const rows = displayStudents.map(s => [
       s.studentId,
@@ -100,7 +92,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
       safeCSV(s.yearLevel),
       safeCSV(s.program)
     ]);
-    
     const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -119,12 +110,9 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
 
   const handleSave = (studentData: Student) => {
     const isExisting = students.some(s => s.studentId === studentData.studentId);
-    
-    // If we are editing, we skip the ID check for the student being edited
     if (selectedStudent) {
         setStudents(prev => prev.map(s => s.studentId === selectedStudent.studentId ? studentData : s));
     } else {
-        // Creating new
         if (isExisting) return alert("A student with this ID already exists!");
         setStudents(prev => [...prev, studentData]);
     }
@@ -140,7 +128,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
 
   return (
     <div className="table-card">
-      {/* Header Section */}
       <div className="card-header">
         <div className="header-top-row">
           <div className="title-group">
@@ -148,13 +135,11 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
             <span className="count-badge">
               <Users size={14} /> {displayStudents.length}
             </span>
-            
             {selectedIds.length > 0 && (
               <button className="btn-bulk-delete" onClick={handleBulkDelete}>
                 <Trash2 size={16} /> Delete ({selectedIds.length})
               </button>
             )}
-
           </div>
            
           <div className="action-buttons-group">
@@ -167,10 +152,9 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
           </div>
         </div>
 
-        {/* Filter Toolbar */}
         <div className="header-controls">
           <div className="search-container">
-            <Search size={18} className="search-icon" />
+            <Search size={16} className="search-icon" />
             <input 
               type="text" 
               placeholder="Search name or ID..." 
@@ -179,7 +163,7 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
               className="search-input"
             />
             {searchQuery && (
-                <button className="search-clear-btn" onClick={() => setSearchQuery('')}>
+                <button className="search-clear-btn" onClick={() => setSearchQuery('')} aria-label="Clear search">
                     <X size={14} />
                 </button>
             )}
@@ -213,7 +197,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
         </div>
       </div>
 
-      {/* Table Section */}
       <div className="table-wrapper">
         <table className="modern-table">
           <thead>
@@ -250,7 +233,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
                   <td>{s.yearLevel}</td>
                   <td><span className="program-tag">{s.program}</span></td>
                   <td>
-                    
                     <div className="action-buttons-row">
                       <button className="btn-icon edit" title="Edit" onClick={() => { setSelectedStudent(s); setIsModalOpen(true); }}>
                         <Edit3 size={16} />
@@ -259,13 +241,12 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
                         <Trash2 size={16} />
                       </button>
                     </div>
-
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="empty-state">
+                <td colSpan={7} className="empty-state-cell">
                   <div className="empty-content">
                     <Search size={40} className="empty-icon"/>
                     <p>No records found matching your criteria.</p>

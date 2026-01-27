@@ -36,8 +36,9 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-full: 9999px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
   --transition-base: all 0.2s ease;
 }
 
@@ -99,47 +100,79 @@
   flex-wrap: wrap;
 }
 
+/* --- Fixed Search Bar Styles --- */
 .search-container {
   position: relative;
-  flex-grow: 1;
+  flex: 2; /* Allow it to take more space than filters */
   min-width: 300px;
+  display: flex;
+  align-items: center;
 }
 
 .search-icon {
   position: absolute;
   left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  z-index: 2;
   color: var(--color-text-muted);
+  pointer-events: none;
 }
 
 .search-input {
   width: 100%;
-  padding: 10px 10px 10px 40px;
+  padding: 10px 40px 10px 38px; /* Balanced padding for icons on both sides */
   background: var(--color-bg-main);
   border: 1px solid var(--color-border-base);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
+  transition: var(--transition-base);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-main);
+  transition: var(--transition-base);
+  padding: 0;
+}
+
+.search-clear-btn:hover {
+  background: var(--color-danger);
+  color: white;
 }
 
 .filter-group {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--color-bg-surface);
   border: 1px solid var(--color-border-base);
   border-radius: var(--radius-sm);
   padding: 0 12px;
   height: 42px;
+  background: white;
 }
 
 .filter-select {
   border: none;
   background: transparent;
   font-size: 0.9rem;
-  color: var(--color-text-main);
-  cursor: pointer;
   outline: none;
+  cursor: pointer;
 }
 
 /* --- Buttons --- */
@@ -187,21 +220,41 @@
 }
 
 .modern-table thead th {
-  background: #1a1a1a; /* Dark header matching your image */
+  background: #1a1a1a;
   color: white;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.8rem;
   padding: 16px;
   text-align: left;
-  border: none;
+  font-size: 0.8rem;
+  text-transform: uppercase;
 }
 
 .modern-table tbody td {
   padding: 14px 16px;
   border-bottom: 1px solid var(--color-border-subtle);
-  color: var(--color-text-main);
-  font-size: 0.9rem;
+}
+
+.row-selected {
+  background-color: var(--color-primary-light) !important;
+}
+
+.btn-bulk-delete {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.empty-state-cell {
+  padding: 60px !important;
+  text-align: center;
+  color: var(--color-text-muted);
 }
 
 .modern-table tbody tr:hover {
@@ -211,12 +264,11 @@
 /* --- Data Components --- */
 .program-tag {
   background: var(--color-bg-main);
-  color: var(--color-text-main);
-  padding: 4px 12px;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
   border: 1px solid var(--color-border-base);
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .action-buttons-row {
