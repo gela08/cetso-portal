@@ -3,7 +3,7 @@ import '../styles/pages/scanner.css';
 
 // Types must match INITIAL_STUDENTS in Data.ts
 interface Student {
-  id: string;
+  studentId: string;
   firstName: string; 
   lastName: string;
   yearLevel: string;
@@ -126,7 +126,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
                   {/* FIXED: Displaying split names correctly */}
                   <h4>{lastScan.student.firstName} {lastScan.student.lastName}</h4>
                   <p>{lastScan.student.program} — {lastScan.student.yearLevel}</p>
-                  <span className="id-badge">{lastScan.student.id}</span>
+                  <span className="id-badge">{lastScan.student.studentId}</span>
                 </div>
               </div>
             )}

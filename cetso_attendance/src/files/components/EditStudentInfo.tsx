@@ -10,17 +10,13 @@ interface ModalProps {
   student?: Student | null;
 }
 
-const EditStudentInfo = ({
-  isOpen,
-  onClose,
-  onSave,
-  student
-}: ModalProps) => {
+const EditStudentInfo = ({ isOpen, onClose, onSave, student }: ModalProps) => {
   const [formData, setFormData] = useState<Partial<Student>>({
+    studentId: 0,
     firstName: '',
     lastName: '',
-    yearLevel: 1,
-    program: 'BSCS'
+    yearLevel: '1st Year',
+    program: 'BSIT'
   });
 
   useEffect(() => {
@@ -28,10 +24,11 @@ const EditStudentInfo = ({
       setFormData(student);
     } else {
       setFormData({
+        studentId: 0,
         firstName: '',
         lastName: '',
-        yearLevel: 1,
-        program: 'BSCS'
+        yearLevel: '1st Year',
+        program: 'BSIT'
       });
     }
   }, [student, isOpen]);
@@ -40,12 +37,17 @@ const EditStudentInfo = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Construct the clean data object
+    const finalData: Student = {
+      studentId: Number(formData.studentId),
+      firstName: formData.firstName || '',
+      lastName: formData.lastName || '',
+      yearLevel: String(formData.yearLevel),
+      program: formData.program || 'BSIT'
+    };
 
-    onSave({
-      ...formData,
-      program: formData.program!.trim().toUpperCase(),
-      yearLevel: Number(formData.yearLevel)
-    } as Student);
+    onSave(finalData);
   };
 
   return (
@@ -60,14 +62,15 @@ const EditStudentInfo = ({
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>First Name</label>
+            <label>Student ID</label>
             <input
-              type="text"
-              value={formData.firstName || ''}
-              onChange={(e) =>
-                setFormData({ ...formData, firstName: e.target.value })
-              }
+              type="number"
+              placeholder="e.g. 59812345"
+              value={formData.studentId || ''}
+              onChange={(e) => setFormData({ ...formData, studentId: Number(e.target.value) })}
               required
+              // Disable ID editing to prevent record mismatch
+              disabled={!!student} 
             />
           </div>
 
@@ -76,9 +79,17 @@ const EditStudentInfo = ({
             <input
               type="text"
               value={formData.lastName || ''}
-              onChange={(e) =>
-                setFormData({ ...formData, lastName: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>First Name</label>
+            <input
+              type="text"
+              value={formData.firstName || ''}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               required
             />
           </div>
@@ -88,40 +99,32 @@ const EditStudentInfo = ({
               <label>Year Level</label>
               <select
                 value={formData.yearLevel}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    yearLevel: Number(e.target.value)
-                  })
-                }
+                onChange={(e) => setFormData({ ...formData, yearLevel: e.target.value })}
               >
-                <option value={1}>1st Year</option>
-                <option value={2}>2nd Year</option>
-                <option value={3}>3rd Year</option>
-                <option value={4}>4th Year</option>
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
               </select>
             </div>
 
             <div className="form-group">
               <label>Program</label>
-              <input
-                type="text"
-                value={formData.program || ''}
-                onChange={(e) =>
-                  setFormData({ ...formData, program: e.target.value })
-                }
-                placeholder="e.g. BSIT"
+              <select
+                value={formData.program}
+                onChange={(e) => setFormData({ ...formData, program: e.target.value })}
                 required
-              />
+              >
+                <option value="BSIT">BSIT</option>
+                <option value="BSCpE">BSCpE</option>
+                <option value="BSECE">BSECE</option>
+                <option value="BLIS">BLIS</option>
+              </select>
             </div>
           </div>
 
           <div className="modal-actions">
-            <button
-              type="button"
-              className="btn-secondary"
-              onClick={onClose}
-            >
+            <button type="button" className="btn-secondary" onClick={onClose}>
               Cancel
             </button>
             <button type="submit" className="btn-primary">

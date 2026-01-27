@@ -11,7 +11,7 @@ export interface SanctionRule {
 export const INITIAL_STUDENTS = [
 
   {
-    id: '2021-0001',
+    studentId: '123',
     firstName: 'Jerome',
     lastName: 'Sagunday',
     yearLevel: '3rd Year',
@@ -19,7 +19,7 @@ export const INITIAL_STUDENTS = [
   },
 
   {
-    id: '2022-0456',
+    studentId: '1234',
     firstName: 'You Jerome',
     lastName: 'We Miss',
     yearLevel: '1st Year',
@@ -27,7 +27,7 @@ export const INITIAL_STUDENTS = [
   },
 
   {
-    id: '2023-0123',
+    studentId: '12345',
     firstName: 'NAH',
     lastName: 'HELL',
     yearLevel: '1st Year',
@@ -35,7 +35,7 @@ export const INITIAL_STUDENTS = [
   },
 
   {
-    id: '2021-9999',
+    studentId: '123456',
     firstName: 'Way Bro',
     lastName: 'Aint No',
     yearLevel: '4th Year',
