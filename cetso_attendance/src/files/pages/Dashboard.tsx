@@ -1,49 +1,48 @@
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, Scale, ClipboardList, Menu, X, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Users, Scale, ClipboardList, Menu, X, ChevronRight, Database } from 'lucide-react';
 import StudentRecords from './StudentRecords';
 import SanctionList from './SanctionList';
-import ProgramView from '../components/ProgramView'; // This is our new generic component
-import { INITIAL_STUDENTS } from '../utils/Data';
+import ProgramView from '../components/ProgramView';
+import { DatabaseAdmin } from '../utils/DatabaseAdmin'; // Import the tool created earlier
 import '../styles/pages/dashboard.css';
 
-const DashboardPage: React.FC<{ attendance: any[], setAttendance: any }> = ({ attendance }) => {
+interface DashboardProps {
+  attendance: any[];
+  setAttendance: any;
+  dbStudents: any[]; // New prop for live database students
+}
+
+const DashboardPage: React.FC<DashboardProps> = ({ attendance, dbStudents }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [programFilter, setProgramFilter] = useState('ALL');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
-  // Load students from LocalStorage or Initial Data
-  const [students] = useState(() => {
-    const saved = localStorage.getItem('cetso_students');
-    return saved ? JSON.parse(saved) : INITIAL_STUDENTS;
-  });
-
   const programs = ['BLIS', 'BSCpE', 'BSECE', 'BSIT'];
 
-  /**
-   * Main Content Switcher
-   */
   const renderContent = () => {
     switch (activeTab) {
       case 'records': 
-        return <StudentRecords initialStudents={students} programFilter={programFilter} />;
+        return <StudentRecords initialStudents={dbStudents} programFilter={programFilter} />;
       
       case 'sanctions': 
-        return <SanctionList students={students} attendance={attendance} />;
+        return <SanctionList students={dbStudents} attendance={attendance} />;
       
       case 'logs': 
-        // We pass the current programFilter (e.g., 'BSIT') to the generic view
         return <ProgramView 
                   program={programFilter} 
-                  students={students} 
+                  students={dbStudents} 
                   attendance={attendance} 
                 />;
+      
+      case 'admin':
+        return <DatabaseAdmin />;
 
       default:
         return (
           <div className="stats-grid">
             <div className="stat-card highlight">
               <span className="stat-label">TOTAL POPULATION</span>
-              <h2 className="stat-value">{students.length}</h2>
+              <h2 className="stat-value">{dbStudents.length}</h2>
             </div>
             <div className="stat-card">
               <span className="stat-label">TOTAL LOGS</span>
@@ -56,8 +55,6 @@ const DashboardPage: React.FC<{ attendance: any[], setAttendance: any }> = ({ at
 
   return (
     <div className={`dashboard-wrapper ${isSidebarOpen ? 'sidebar-mobile-open' : ''}`}>
-      
-      {/* Sidebar Navigation */}
       <aside className="dashboard-sidebar">
         <div className="sidebar-header">
           <div className="sidebar-brand">
@@ -108,10 +105,19 @@ const DashboardPage: React.FC<{ attendance: any[], setAttendance: any }> = ({ at
               </button>
             ))}
           </div>
+
+          {/* New Admin Section */}
+          <div className="nav-section" style={{ marginTop: 'auto', borderTop: '1px solid #eee', paddingTop: '10px' }}>
+            <button 
+              className={`nav-link ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('admin'); setIsSidebarOpen(false); }}
+            >
+              <Database size={18}/> Database Admin
+            </button>
+          </div>
         </nav>
       </aside>
 
-      {/* Main Content Area */}
       <main className="dashboard-main">
         <header className="main-header">
           <button className="menu-btn" onClick={() => setIsSidebarOpen(true)}>
@@ -119,7 +125,7 @@ const DashboardPage: React.FC<{ attendance: any[], setAttendance: any }> = ({ at
           </button>
           <div className="header-title">
             <h1>
-              {activeTab === 'logs' ? `${programFilter} Department` : activeTab.replace('-', ' ').toUpperCase()}
+              {activeTab === 'logs' ? `${programFilter} Department` : activeTab.toUpperCase()}
             </h1>
             <p>Welcome back, Admin</p>
           </div>

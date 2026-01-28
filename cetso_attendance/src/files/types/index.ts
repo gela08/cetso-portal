@@ -1,11 +1,17 @@
 export interface AttendanceRecord {
-  id: string;
-  studentId: string;
-  name: string;
+  id?: string;           // Optional for new records, required for fetched ones
+  student_id: number;    // Database uses numeric ID
+  first_name: string;    // Split names to match student table
+  last_name: string;
   program: string;
-  timestamp: string; // Full ISO string
-  date: string;      // e.g., "2026-01-26"
-  eventName: string; // e.g., "Intramurals 2026"
+  year_level: string;
+  timestamp: string;     // ISO string (timestamptz in Supabase)
+  
+  // UI Helper Fields (Parsed from the 'type' string or timestamp)
+  eventName: string;     // e.g., "Intramurals"
   session: 'Morning' | 'Afternoon';
   type: 'IN' | 'OUT';
 }
+
+// Helper to determine the status color in your UI
+export type AttendanceStatus = 'success' | 'error' | 'duplicate';

@@ -15,11 +15,11 @@ const SanctionList = ({ students, attendance, activeEvent }: any) => {
   const currentEvent = activeEvent || 'Intramurals';
   const totalRequired = currentEvent === 'Orientation' ? 2 : 12;
 
-  // 2. Memoized Calculation (Performance Optimized)
+  // 2. Memoized Calculation (Handling Supabase snake_case)
   const filteredData = useMemo(() => {
-    // Only use rules belonging to the active event category
     const relevantRules = SANCTION_RULES.filter(rule => rule.category === currentEvent);
     
+    // We map the database data to what the logic expects, or update logic to handle both
     const rawData = calculateSanctions(
       students,
       attendance,
@@ -32,7 +32,6 @@ const SanctionList = ({ students, attendance, activeEvent }: any) => {
 
   return (
     <div className="sanction-wrapper">
-      {/* Program Selection Tabs */}
       <div className="program-tabs">
         {PROGRAMS.map((prog) => (
           <button
@@ -46,7 +45,6 @@ const SanctionList = ({ students, attendance, activeEvent }: any) => {
       </div>
 
       <div className="sanction-container">
-        {/* Context Info Bar */}
         <div className="sanction-info-bar">
           <div className="info-meta">
             <Info size={18} className="info-icon" />
@@ -68,11 +66,11 @@ const SanctionList = ({ students, attendance, activeEvent }: any) => {
           </button>
         </div>
 
-        {/* Year Level Sections */}
         {YEAR_LEVELS.map((year) => {
+          // Note: s.year_level or s.yearLevel depending on how your Logic helper returns it
           const yearData = filteredData
-            .filter((s: any) => s.yearLevel === year)
-            .sort((a: any, b: any) => a.lastName.localeCompare(b.lastName));
+            .filter((s: any) => (s.year_level || s.yearLevel) === year)
+            .sort((a: any, b: any) => (a.last_name || a.lastName).localeCompare(b.last_name || b.lastName));
 
           return (
             <div key={year} className="year-section">
@@ -97,11 +95,11 @@ const SanctionList = ({ students, attendance, activeEvent }: any) => {
                   <tbody>
                     {yearData.length > 0 ? (
                       yearData.map((s: any, i: number) => (
-                        <tr key={s.studentId}>
+                        <tr key={s.student_id || s.studentId}>
                           <td className="row-index">{i + 1}</td>
-                          <td className="mono-text">{s.studentId}</td>
-                          <td className="name-cell">{s.lastName}</td>
-                          <td className="name-cell">{s.firstName}</td>
+                          <td className="mono-text">{s.student_id || s.studentId}</td>
+                          <td className="name-cell">{s.last_name || s.lastName}</td>
+                          <td className="name-cell">{s.first_name || s.firstName}</td>
                           <td><span className="absences-cell">{s.absences}</span></td>
                           <td><span className="item-name">{s.item}</span></td>
                           <td><span className="price-tag">₱{s.price}</span></td>

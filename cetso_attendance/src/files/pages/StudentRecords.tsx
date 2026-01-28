@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
-  UserPlus, Edit3, Trash2, Search, Filter, 
-  RotateCcw, ArrowUpDown, Users, Download, X
+  UserPlus, Edit3, Trash2, Search, Filter, ArrowUpDown, Users, Download,
 } from 'lucide-react';
+import { supabase } from '../utils/supabaseClient';
 import EditStudentInfo from '../components/EditStudentInfo';
 import '../styles/pages/studentrecords.css';
 
@@ -10,6 +10,7 @@ export interface Student {
   studentId: number;
   firstName: string;
   lastName: string;
+  email: string;
   yearLevel: string;
   program: string;
 }
@@ -35,16 +36,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
     setStudents(initialStudents);
   }, [initialStudents]);
 
-  useEffect(() => {
-    setSearchQuery('');
-    setYearFilter('ALL');
-    setSelectedIds([]);
-  }, [programFilter]);
-
-  useEffect(() => {
-    setSelectedIds([]);
-  }, [searchQuery, yearFilter]);
-
   const displayStudents = useMemo(() => {
     const yearWeight: Record<string, number> = {
       '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4
@@ -56,7 +47,7 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
         const targetFilter = programFilter?.trim().toUpperCase() || 'ALL';
         const matchProgram = targetFilter === 'ALL' || currentProgram === targetFilter;
         const matchYear = yearFilter === 'ALL' || s.yearLevel === yearFilter;
-        const fullSearch = `${s.firstName} ${s.lastName} ${s.studentId}`.toLowerCase();
+        const fullSearch = `${s.firstName} ${s.lastName} ${s.studentId} ${s.email}`.toLowerCase();
         const matchSearch = fullSearch.includes(searchQuery.toLowerCase().trim());
         return matchProgram && matchYear && matchSearch;
       })
@@ -67,63 +58,69 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
       });
   }, [students, programFilter, yearFilter, searchQuery, sortBy]);
 
-  const toggleSelectAll = () => {
-    if (selectedIds.length === displayStudents.length && displayStudents.length > 0) {
-      setSelectedIds([]);
+  const handleSave = async (studentData: any) => {
+    // Mapping frontend names to Supabase snake_case columns
+    const dbPayload = {
+      student_id: studentData.student_id || studentData.studentId,
+      first_name: studentData.first_name || studentData.firstName,
+      last_name: studentData.last_name || studentData.lastName,
+      email: studentData.email,
+      year_level: studentData.student_level || studentData.yearLevel,
+      program: studentData.program
+    };
+
+    if (selectedStudent) {
+      const { error } = await supabase
+        .from('students')
+        .update(dbPayload)
+        .eq('student_id', selectedStudent.studentId);
+      
+      if (error) return alert("Update failed: " + error.message);
     } else {
-      setSelectedIds(displayStudents.map(s => s.studentId));
+      const { error } = await supabase
+        .from('students')
+        .insert([dbPayload]);
+      
+      if (error) return alert("Failed to add student: " + error.message);
+    }
+
+    setIsModalOpen(false);
+  };
+
+  const handleDelete = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this student?')) {
+      const { error } = await supabase
+        .from('students')
+        .delete()
+        .eq('student_id', id);
+
+      if (error) alert("Delete failed: " + error.message);
     }
   };
 
-  const toggleSelectOne = (id: number) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
+  const handleBulkDelete = async () => {
+    if (window.confirm(`Permanently delete ${selectedIds.length} records?`)) {
+      const { error } = await supabase
+        .from('students')
+        .delete()
+        .in('student_id', selectedIds);
+
+      if (error) alert("Bulk delete failed: " + error.message);
+      else setSelectedIds([]);
+    }
   };
 
   const handleExportCSV = () => {
     if (displayStudents.length === 0) return alert("No data to export");
-    const safeCSV = (str: string | number) => `"${String(str).replace(/"/g, '""')}"`;
-    const headers = ["Student ID", "Last Name", "First Name", "Year Level", "Program"];
-    const rows = displayStudents.map(s => [
-      s.studentId,
-      safeCSV(s.lastName),
-      safeCSV(s.firstName),
-      safeCSV(s.yearLevel),
-      safeCSV(s.program)
-    ]);
+    const headers = ["Student ID", "Last Name", "First Name", "Email", "Year Level", "Program"];
+    const rows = displayStudents.map(s => [s.studentId, s.lastName, s.firstName, s.email, s.yearLevel, s.program]);
     const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `Masterlist_${programFilter}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.download = `CETSO_Masterlist_${programFilter}_${new Date().toLocaleDateString()}.csv`;
     link.click();
-  };
-
-  const handleBulkDelete = () => {
-    if (window.confirm(`Are you sure you want to delete ${selectedIds.length} selected records?`)) {
-      setStudents(prev => prev.filter(s => !selectedIds.includes(s.studentId)));
-      setSelectedIds([]);
-    }
-  };
-
-  const handleSave = (studentData: Student) => {
-    const isExisting = students.some(s => s.studentId === studentData.studentId);
-    if (selectedStudent) {
-        setStudents(prev => prev.map(s => s.studentId === selectedStudent.studentId ? studentData : s));
-    } else {
-        if (isExisting) return alert("A student with this ID already exists!");
-        setStudents(prev => [...prev, studentData]);
-    }
-    setIsModalOpen(false);
-  };
-
-  const handleDelete = (id: number) => {
-    if (window.confirm('Are you sure you want to delete this record?')) {
-      setStudents(prev => prev.filter(s => s.studentId !== id));
-      setSelectedIds(prev => prev.filter(item => item !== id));
-    }
   };
 
   return (
@@ -133,15 +130,15 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
           <div className="title-group">
             <h3 className="section-title">Masterlist</h3>
             <span className="count-badge">
-              <Users size={14} /> {displayStudents.length}
+              <Users size={14} /> {displayStudents.length} Students
             </span>
             {selectedIds.length > 0 && (
               <button className="btn-bulk-delete" onClick={handleBulkDelete}>
-                <Trash2 size={16} /> Delete ({selectedIds.length})
+                <Trash2 size={16} /> Delete Selected ({selectedIds.length})
               </button>
             )}
           </div>
-           
+            
           <div className="action-buttons-group">
             <button className="btn-export" onClick={handleExportCSV}>
               <Download size={18} /> <span className="btn-text">Export CSV</span>
@@ -157,16 +154,11 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
             <Search size={16} className="search-icon" />
             <input 
               type="text" 
-              placeholder="Search name or ID..." 
+              placeholder="Search by name, ID, or email..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
-            {searchQuery && (
-                <button className="search-clear-btn" onClick={() => setSearchQuery('')} aria-label="Clear search">
-                    <X size={14} />
-                </button>
-            )}
           </div>
 
           <div className="filter-group">
@@ -184,16 +176,10 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
             <ArrowUpDown size={16} className="filter-icon" />
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)} className="filter-select">
               <option value="lastName">Sort: Name (A-Z)</option>
-              <option value="studentId">Sort: ID</option>
-              <option value="yearLevel">Sort: Year</option>
+              <option value="studentId">Sort: ID Number</option>
+              <option value="yearLevel">Sort: Year Level</option>
             </select>
           </div>
-
-          {(searchQuery || yearFilter !== 'ALL' || sortBy !== 'lastName') && (
-            <button className="btn-reset" onClick={() => { setSearchQuery(''); setYearFilter('ALL'); setSortBy('lastName'); }}>
-              <RotateCcw size={14} /> Reset
-            </button>
-          )}
         </div>
       </div>
 
@@ -205,12 +191,16 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
                 <input 
                   type="checkbox" 
                   checked={selectedIds.length === displayStudents.length && displayStudents.length > 0}
-                  onChange={toggleSelectAll}
+                  onChange={() => {
+                    if (selectedIds.length === displayStudents.length) setSelectedIds([]);
+                    else setSelectedIds(displayStudents.map(s => s.studentId));
+                  }}
                 />
               </th>
               <th>Student ID</th>
               <th>Last Name</th>
               <th>First Name</th>
+              <th>Email</th>
               <th>Year Level</th>
               <th>Program</th>
               <th>Actions</th>
@@ -224,12 +214,17 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
                     <input 
                       type="checkbox" 
                       checked={selectedIds.includes(s.studentId)}
-                      onChange={() => toggleSelectOne(s.studentId)}
+                      onChange={() => {
+                        setSelectedIds(prev => 
+                          prev.includes(s.studentId) ? prev.filter(id => id !== s.studentId) : [...prev, s.studentId]
+                        );
+                      }}
                     />
                   </td>
                   <td className="font-mono">{s.studentId}</td>
                   <td className="font-bold">{s.lastName}</td>
                   <td>{s.firstName}</td>
+                  <td className="email-cell">{s.email || '—'}</td>
                   <td>{s.yearLevel}</td>
                   <td><span className="program-tag">{s.program}</span></td>
                   <td>
@@ -246,12 +241,8 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="empty-state-cell">
-                  <div className="empty-content">
-                    <Search size={40} className="empty-icon"/>
-                    <p>No records found matching your criteria.</p>
-                    <button className="btn-link" onClick={() => {setSearchQuery(''); setYearFilter('ALL')}}>Clear filters</button>
-                  </div>
+                <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                  No students found matching your filters.
                 </td>
               </tr>
             )}

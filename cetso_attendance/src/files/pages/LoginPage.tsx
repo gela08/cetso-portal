@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { supabase } from '../utils/supabaseClient'; // Ensure path is correct
 import '../styles/pages/login.css';
 
 interface LoginPageProps {
@@ -9,19 +10,27 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [accessCode, setAccessCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsVerifying(true);
 
-    // Simulate a small delay for a professional "verifying" feel
-    setTimeout(() => {
-      if (accessCode === 'CETSO2025') {
-        onLoginSuccess({ name: 'Officer', role: 'admin' });
-      } else {
-        alert('Invalid Access Code');
-        setIsVerifying(false);
-      }
-    }, 800);
+    // Query Supabase for the access code
+    const { data, error } = await supabase
+      .from('officers')
+      .select('*')
+      .eq('access_code', accessCode)
+      .single();
+
+    if (error || !data) {
+      alert('Invalid Access Code');
+      setIsVerifying(false);
+      setAccessCode('');
+    } else {
+      // Small delay for UX feel
+      setTimeout(() => {
+        onLoginSuccess({ name: data.officer_name, role: data.role });
+      }, 500);
+    }
   };
 
   if (isVerifying) {

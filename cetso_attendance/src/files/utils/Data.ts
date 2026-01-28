@@ -1,3 +1,12 @@
+export interface Student {
+  studentId: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  yearLevel: string;
+  program: string;
+}
+
 export interface SanctionRule {
   category: 'Intramurals' | 'Orientation';
   minAbsences: number;
@@ -6,67 +15,13 @@ export interface SanctionRule {
   price: number;
 }
 
-
-// src/utils/Data.ts
-export const INITIAL_STUDENTS = [
-
-  {
-    studentId: '123',
-    firstName: 'Jerome',
-    lastName: 'Sagunday',
-    yearLevel: '3rd Year',
-    program: 'BSIT'
-  },
-
-  {
-    studentId: '1234',
-    firstName: 'You Jerome',
-    lastName: 'We Miss',
-    yearLevel: '1st Year',
-    program: 'BSIT'
-  },
-
-  {
-    studentId: '12345',
-    firstName: 'NAH',
-    lastName: 'HELL',
-    yearLevel: '1st Year',
-    program: 'BSIT'
-  },
-
-  {
-    studentId: '123456',
-    firstName: 'Way Bro',
-    lastName: 'Aint No',
-    yearLevel: '4th Year',
-    program: 'BSCpE'
-  }
-
+export const INITIAL_STUDENTS: Student[] = [
+  { studentId: 123, firstName: 'Jerome', lastName: 'Sagunday', email: 'jerome.s@example.com', yearLevel: '3rd Year', program: 'BSIT' },
+  { studentId: 1234, firstName: 'You Jerome', lastName: 'We Miss', email: 'miss.jerome@example.com', yearLevel: '1st Year', program: 'BSIT' },
+  { studentId: 12345, firstName: 'NAH', lastName: 'HELL', email: 'nah.hell@example.com', yearLevel: '1st Year', program: 'BSIT' },
+  { studentId: 123456, firstName: 'Way Bro', lastName: 'Aint No', email: 'aint.no@example.com', yearLevel: '4th Year', program: 'BSCpE' }
 ];
 
-// --- DATABASE: SANCTIONS (FOR PUBLIC VIEW) ---
-// This is what the students see on the landing page
-export const INTRAMURALS_DISPLAY = [
-  { eventName: 'Intramurals/Fiesta 2025', absences: '11–12', item: 'Lysol Disinfectant Spray 170g', price: 300 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '10', item: '1 ream short or long bond paper', price: 245 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '9', item: '1 Green Cross/Casino Alcohol 500ml, 1 stamp pad', price: 155 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '8', item: '1 pack band aid, 1 small betadine, 1 cotton', price: 115 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '7', item: '1 Pilot WB Marker, 2 Sign pens (B&B), 1 garbage bag', price: 95 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '6', item: '1 cleaning rag, 1 Pilot WB Marker, 1 masking tape', price: 95 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '5', item: '1 Pilot WB Marker, 1 garbage bag, 2 sign pens', price: 95 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '4', item: 'Canned goods (no sardines) / 1kg rice', price: 90 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '3', item: '1 pack bond paper, 1 Alcohol 250ml', price: 80 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '2', item: '1 short bond paper (20pcs), 1 tissue roll, 2 Carbon paper', price: 70 },
-  { eventName: 'Intramurals/Fiesta 2025', absences: '1', item: '1 Garbage bag, 2 sign pens (blue, black)', price: 50 }
-];
-
-export const ORIENTATION_DISPLAY = [
-  { eventName: '1st Sem Orientation', absences: '2', item: '1 pack Tissue, 1 Green Cross 250ml, 1 black ballpen', price: 70 },
-  { eventName: '1st Sem Orientation', absences: '1', item: '1 Green Cross Alcohol, 1 Tissue roll', price: 50 }
-];
-
-// --- DATABASE: CALCULATION RULES (FOR OFFICER DASHBOARD) ---
-// This is what the system uses to calculate absences
 export const SANCTION_RULES: SanctionRule[] = [
   { category: 'Intramurals', minAbsences: 11, maxAbsences: 12, item: 'Lysol Disinfectant Spray 170g', price: 300 },
   { category: 'Intramurals', minAbsences: 10, maxAbsences: 10, item: '1 ream short or long bond paper', price: 245 },

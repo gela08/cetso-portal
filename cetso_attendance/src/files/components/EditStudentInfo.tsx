@@ -1,33 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import '../styles/components/editstudentinfo.css';
-import type { Student } from '../pages/StudentRecords';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: Student) => void;
-  student?: Student | null;
+  onSave: (data: any) => void;
+  student?: any | null;
 }
 
 const EditStudentInfo = ({ isOpen, onClose, onSave, student }: ModalProps) => {
-  const [formData, setFormData] = useState<Partial<Student>>({
-    studentId: 0,
-    firstName: '',
-    lastName: '',
-    yearLevel: '1st Year',
+  // 1. Initial State matching Supabase Schema
+  const [formData, setFormData] = useState({
+    student_id: '',
+    first_name: '',
+    last_name: '',
+    year_level: '1st Year',
     program: 'BSIT'
   });
 
   useEffect(() => {
     if (student) {
-      setFormData(student);
+      // Map incoming student data to form fields
+      setFormData({
+        student_id: student.student_id || '',
+        first_name: student.first_name || '',
+        last_name: student.last_name || '',
+        year_level: student.year_level || '1st Year',
+        program: student.program || 'BSIT'
+      });
     } else {
       setFormData({
-        studentId: 0,
-        firstName: '',
-        lastName: '',
-        yearLevel: '1st Year',
+        student_id: '',
+        first_name: '',
+        last_name: '',
+        year_level: '1st Year',
         program: 'BSIT'
       });
     }
@@ -38,13 +45,13 @@ const EditStudentInfo = ({ isOpen, onClose, onSave, student }: ModalProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Construct the clean data object
-    const finalData: Student = {
-      studentId: Number(formData.studentId),
-      firstName: formData.firstName || '',
-      lastName: formData.lastName || '',
-      yearLevel: String(formData.yearLevel),
-      program: formData.program || 'BSIT'
+    // Construct the clean data object for Supabase
+    const finalData = {
+      student_id: Number(formData.student_id),
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      year_level: formData.year_level,
+      program: formData.program
     };
 
     onSave(finalData);
@@ -66,11 +73,10 @@ const EditStudentInfo = ({ isOpen, onClose, onSave, student }: ModalProps) => {
             <input
               type="number"
               placeholder="e.g. 59812345"
-              value={formData.studentId || ''}
-              onChange={(e) => setFormData({ ...formData, studentId: Number(e.target.value) })}
+              value={formData.student_id}
+              onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
               required
-              // Disable ID editing to prevent record mismatch
-              disabled={!!student} 
+              disabled={!!student} // IDs cannot be changed once created
             />
           </div>
 
@@ -78,8 +84,8 @@ const EditStudentInfo = ({ isOpen, onClose, onSave, student }: ModalProps) => {
             <label>Last Name</label>
             <input
               type="text"
-              value={formData.lastName || ''}
-              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              value={formData.last_name}
+              onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
               required
             />
           </div>
@@ -88,8 +94,8 @@ const EditStudentInfo = ({ isOpen, onClose, onSave, student }: ModalProps) => {
             <label>First Name</label>
             <input
               type="text"
-              value={formData.firstName || ''}
-              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              value={formData.first_name}
+              onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
               required
             />
           </div>
@@ -98,8 +104,8 @@ const EditStudentInfo = ({ isOpen, onClose, onSave, student }: ModalProps) => {
             <div className="form-group">
               <label>Year Level</label>
               <select
-                value={formData.yearLevel}
-                onChange={(e) => setFormData({ ...formData, yearLevel: e.target.value })}
+                value={formData.year_level}
+                onChange={(e) => setFormData({ ...formData, year_level: e.target.value })}
               >
                 <option value="1st Year">1st Year</option>
                 <option value="2nd Year">2nd Year</option>
@@ -128,7 +134,7 @@ const EditStudentInfo = ({ isOpen, onClose, onSave, student }: ModalProps) => {
               Cancel
             </button>
             <button type="submit" className="btn-primary">
-              Save Record
+              {student ? 'Update Record' : 'Save Record'}
             </button>
           </div>
         </form>
