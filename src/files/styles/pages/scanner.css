@@ -1,0 +1,172 @@
+/* Existing Structure */
+.scanner-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .scanner-container { grid-template-columns: 1fr; }
+}
+
+.scanner-controls {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* NEW: Button Grid Styles */
+.mode-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.8rem;
+  color: #333;
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.mode-btn {
+  padding: 12px 10px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  color: #64748b;
+}
+
+.mode-btn:hover {
+  border-color: #ff6600;
+  color: #ff6600;
+}
+
+.mode-btn.active {
+  background: #ff6600; /* CETSO Orange */
+  color: white;
+  border-color: #ff6600;
+  box-shadow: 0 4px 12px rgba(255, 102, 0, 0.2);
+}
+
+/* Form Styles */
+.scan-form {
+  display: flex;
+  gap: 10px;
+  margin: 2rem 0 1rem 0;
+}
+
+.scan-form input {
+  flex: 1;
+  font-size: 1.1rem;
+  padding: 1rem;
+  border: 2px solid #ff6600;
+  border-radius: 4px;
+}
+
+.scan-form button {
+  background: #222;
+  color: white;
+  padding: 0 1.5rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Result Card Styles */
+.result-card {
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.result-card.success {
+  background-color: #d1fae5;
+  border: 2px solid #10b981;
+  color: #065f46;
+}
+
+.result-card.error {
+  background-color: #fee2e2;
+  border: 2px solid #ef4444;
+  color: #991b1b;
+}
+
+.student-details {
+  margin-top: 1.5rem;
+  background: rgba(255,255,255,0.8);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.avatar-placeholder {
+  width: 50px;
+  height: 50px;
+  background: #ff6600;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.id-badge {
+  display: inline-block;
+  background: #eee;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  font-family: monospace;
+}
+
+/* Waiting State Animation */
+.waiting-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  border: 2px dashed #e2e8f0;
+  border-radius: 8px;
+}
+
+.pulse {
+  width: 15px;
+  height: 15px;
+  background: #ff6600;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  animation: pulse-animation 1.5s infinite;
+}
+
+@keyframes pulse-animation {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

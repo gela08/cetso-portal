@@ -1,0 +1,65 @@
+/* Layout Fix for Sticky Footer */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures footer is pushed to bottom */
+}
+
+.main-content {
+  flex: 1 0 auto; /* This allows content to grow and push the footer */
+}
+
+/* Footer Styling */
+.portal-footer {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding: 2rem 5%;
+  margin-top: 3rem;
+  border-top: 4px solid #ff6600;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-brand h3 {
+  color: #ff6600;
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.footer-brand p {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin: 5px 0 0 0;
+}
+
+.footer-divider {
+  height: 1px;
+  background: #333;
+  margin: 1.5rem 0;
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* Developer Text Highlights */
+.dev-name {
+  color: #ff6600;
+  font-weight: bold;
+}
+
+.developer-credit {
+  background: rgba(255, 102, 0, 0.05);
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid #333;
+}

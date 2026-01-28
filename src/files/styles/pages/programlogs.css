@@ -1,0 +1,28 @@
+.date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f0f0;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.badge.IN { background: #e6fffa; color: #234e52; }
+.badge.OUT { background: #fed7d7; color: #822727; }
+
+.font-mono {
+  font-family: 'Courier New', monospace;
+  letter-spacing: -0.5px;
+  color: #777;
+}

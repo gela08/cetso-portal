@@ -1,0 +1,56 @@
+.public-container {
+  max-width: 100%;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  color: var(--cetso-black);
+  font-size: 2.2rem;
+  border-bottom: 4px solid var(--cetso-orange);
+  display: inline-block;
+  padding-bottom: 0.5rem;
+}
+
+.card {
+  background: var(--cetso-white);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  border-top: 4px solid var(--cetso-orange);
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.modern-table th {
+  background-color: var(--cetso-black);
+  color: var(--cetso-white);
+  padding: 12px;
+  text-align: left;
+}
+
+.modern-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.modern-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+.note-box {
+  margin-top: 2rem;
+  background-color: #fff4e5;
+  padding: 1rem;
+  border-left: 4px solid var(--cetso-orange);
+  color: #666;
+}
