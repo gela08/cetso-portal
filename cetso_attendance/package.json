@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@supabase/supabase-js": "^2.93.2",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "supabase-js": "^0.0.1-security",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -26,6 +28,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "supabase": "^2.72.9",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
