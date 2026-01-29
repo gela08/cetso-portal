@@ -25,13 +25,17 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  color: white; /* Added to fix link default color */
 }
 
 .brand-orange {
   color: var(--cetso-orange);
 }
 
+/* Unified style for both links and buttons */
+.nav-links .nav-item, 
 .nav-links button {
+  text-decoration: none;
   background: transparent;
   border: none;
   color: #ccc;
@@ -41,10 +45,11 @@
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-block;
 }
 
-.nav-links button:hover, 
-.nav-links button.active {
+.nav-links .nav-item:hover, 
+.nav-links .nav-item.active {
   color: var(--cetso-white);
   background-color: rgba(255, 255, 255, 0.1);
 }
@@ -67,15 +72,4 @@
 
 .btn-logout:hover {
   background-color: #b91c1c !important;
-}
-
-
-.nav-logo {
-  width: 40px;
-  height: 40px;
-  /* This makes the image a perfect circle */
-  border-radius: 50%; 
-  /* This ensures the image doesn't stretch */
-  object-fit: cover; 
-  border: 2px solid var(--cetso-orange);
 }

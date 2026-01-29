@@ -1,75 +1,63 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { supabase } from './files/utils/supabaseClient';
+
+// Layout Components
 import Navbar from './files/components/Navbar';
 import Footer from './files/components/Footer';
 
-// Pages
+// Public Pages
 import PublicPage from './files/pages/PublicPage';
+import CollegeOfficers from './files/pages/public/CollegeOfficers';
+import ProgramOfficers from './files/pages/public/ProgramOfficers';
+import PublicSanctions from './files/pages/public/PublicSanctions';
+import SubmissionPortal from './files/pages/public/SubmissionPortal';
+
+// Admin/Protected Pages
 import LoginPage from './files/pages/LoginPage';
 import ScannerPage from './files/pages/ScannerPage';
 import DashboardPage from './files/pages/Dashboard';
 
-// Supabase Connection
-import { supabase } from './files/utils/supabaseClient';
 import './App.css';
 
-const ProtectedRoute = ({ user, children, setView }: any) => {
-  useEffect(() => {
-    if (!user) setView('login');
-  }, [user, setView]);
-  return user ? children : null;
-};
-
 const App = () => {
-  const [view, setView] = useState('public');
   const [user, setUser] = useState<any>(null);
   const [attendance, setAttendance] = useState<any[]>([]);
   const [dbStudents, setDbStudents] = useState<any[]>([]);
+  const navigate = useNavigate();
 
-  // Function to fetch students (called on mount and via real-time)
+  // --- DATA FETCHING ---
   const fetchStudents = async () => {
     const { data, error } = await supabase.from('students').select('*');
     if (error) console.error("Error fetching students:", error);
-    else setDbStudents(data);
+    else setDbStudents(data || []);
   };
 
-  // Function to fetch attendance (called on mount and via real-time)
   const fetchAttendance = async () => {
     const { data, error } = await supabase
       .from('attendance_logs')
       .select('*')
       .order('timestamp', { ascending: false });
     if (error) console.error("Error fetching attendance:", error);
-    else setAttendance(data);
+    else setAttendance(data || []);
   };
 
   useEffect(() => {
-    // Initial Load
     fetchStudents();
     fetchAttendance();
 
-    // --- REAL-TIME: ATTENDANCE LOGS ---
     const attendanceChannel = supabase
       .channel('attendance_live')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'attendance_logs' },
-        (payload) => {
-          setAttendance((prev) => [payload.new, ...prev]);
-        }
-      )
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'attendance_logs' }, 
+      (payload) => {
+        setAttendance((prev) => [payload.new, ...prev]);
+      })
       .subscribe();
 
-    // --- REAL-TIME: STUDENTS MASTERLIST ---
-    // This listens for any changes (INSERT, UPDATE, DELETE) to the student list
     const studentChannel = supabase
       .channel('students_live')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'students' },
-        () => {
-          fetchStudents(); // Re-sync the local list whenever database changes
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'students' }, 
+      () => { fetchStudents(); })
       .subscribe();
 
     return () => {
@@ -78,17 +66,13 @@ const App = () => {
     };
   }, []);
 
+  // --- LOGIC ---
   const handleRecordAttendance = async (studentIdInput: string, type: string) => {
     const numericId = parseInt(studentIdInput, 10);
-    if (isNaN(numericId)) {
-      return { success: false, msg: "Invalid ID format. Numbers only." };
-    }
+    if (isNaN(numericId)) return { success: false, msg: "Invalid ID format." };
 
-    // Standardize key lookup (Supabase uses student_id)
     const student = dbStudents.find(s => (s.student_id || s.studentId) === numericId);
-    if (!student) {
-      return { success: false, msg: `ID ${numericId} not found in database.` };
-    }
+    if (!student) return { success: false, msg: `ID ${numericId} not found.` };
 
     const today = new Date().toDateString();
     const duplicate = attendance.find(r =>
@@ -97,13 +81,7 @@ const App = () => {
       new Date(r.timestamp).toDateString() === today
     );
 
-    if (duplicate) {
-      return {
-        success: false,
-        msg: `Attendance already recorded for ${student.first_name || student.firstName} today.`,
-        student
-      };
-    }
+    if (duplicate) return { success: false, msg: "Already recorded today.", student };
 
     const newRecord = {
       student_id: student.student_id || student.studentId,
@@ -115,55 +93,51 @@ const App = () => {
       timestamp: new Date().toISOString()
     };
 
-    const { error } = await supabase
-      .from('attendance_logs')
-      .insert([newRecord]);
+    const { error } = await supabase.from('attendance_logs').insert([newRecord]);
+    if (error) return { success: false, msg: "Database error." };
 
-    if (error) return { success: false, msg: "Failed to save to cloud database." };
-
-    return {
-      success: true,
-      msg: `Successfully recorded ${type} for ${student.first_name || student.firstName}`,
-      student
-    };
+    return { success: true, msg: "Recorded successfully!", student };
   };
 
   const handleLogout = () => {
     setUser(null);
-    setView('public');
+    navigate('/'); 
   };
 
   return (
     <div className="app">
-      <Navbar currentView={view} setView={setView} user={user} logout={handleLogout} />
+      <Navbar user={user} logout={handleLogout} />
+      
       <main className="main-content">
-        {view === 'public' && <PublicPage />}
-        
-        {view === 'login' && (
-          <LoginPage onLoginSuccess={(userData) => {
-            setUser(userData);
-            setView('dashboard');
-          }} />
-        )}
+        <Routes>
+          {/* --- PUBLIC ROUTES --- */}
+          <Route path="/" element={<PublicPage />} />
+          <Route path="/public/college-officers" element={<CollegeOfficers />} />
+          <Route path="/public/program-officers" element={<ProgramOfficers />} />
+          <Route path="/public/sanctions" element={<PublicSanctions />} />
+          <Route path="/public/submissions" element={<SubmissionPortal />} />
+          
+          <Route path="/login" element={
+            <LoginPage onLoginSuccess={(userData) => {
+              setUser(userData);
+              navigate('/dashboard'); 
+            }} />
+          } />
 
-        {view === 'scanner' && (
-          <ProtectedRoute user={user} setView={setView}>
-            <ScannerPage
-              students={dbStudents}
-              onRecordAttendance={handleRecordAttendance}
-            />
-          </ProtectedRoute>
-        )}
+          {/* --- PROTECTED ADMIN ROUTES --- */}
+          <Route 
+            path="/scanner" 
+            element={user ? <ScannerPage students={dbStudents} onRecordAttendance={handleRecordAttendance} /> : <Navigate to="/login" />} 
+          />
+          
+          <Route 
+            path="/dashboard" 
+            element={user ? <DashboardPage attendance={attendance} setAttendance={setAttendance} dbStudents={dbStudents} /> : <Navigate to="/login" />} 
+          />
 
-        {view === 'dashboard' && (
-          <ProtectedRoute user={user} setView={setView}>
-            <DashboardPage 
-              attendance={attendance} 
-              setAttendance={setAttendance} 
-              dbStudents={dbStudents} 
-            />
-          </ProtectedRoute>
-        )}
+          {/* Fallback for 404s */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
       </main>
       <Footer />
     </div>

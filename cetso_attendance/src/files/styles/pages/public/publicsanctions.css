@@ -1,0 +1,73 @@
+/* Specific Styles for Public Sanctions & Guidelines */
+
+.filter-controls {
+  margin-bottom: 2rem;
+  background: #fdfdfd;
+}
+
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+}
+
+.form-item label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--cetso-black);
+  font-size: 0.9rem;
+}
+
+.search-input-wrapper input, 
+.form-item select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.search-input-wrapper input:focus, 
+.form-item select:focus {
+  outline: none;
+  border-color: var(--cetso-orange);
+}
+
+.year-grid-public {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.year-list-card {
+  padding: 1.5rem;
+  height: fit-content;
+}
+
+.font-bold {
+  font-weight: 700;
+  color: var(--cetso-black);
+}
+
+.text-red {
+  color: #d63031;
+  font-weight: 700;
+}
+
+/* Guidelines Specific */
+.guidelines-section {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 2px dashed #eee;
+}
+
+@media (max-width: 768px) {
+  .input-grid {
+    grid-template-columns: 1fr;
+  }
+  .year-grid-public {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,20 +1,19 @@
 import React from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import '../styles/components/navbar.css';
 import cetso from '../../assets/cetso.png';
 
 interface NavbarProps {
-  currentView: string;
-  setView: (view: string) => void;
   user: any;
   logout: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentView, setView, user, logout }) => {
-
+const Navbar: React.FC<NavbarProps> = ({ user, logout }) => {
   return (
     <nav className="navbar">
-      <div className="nav-brand" onClick={() => setView('public')}>
-  <img 
+      {/* Brand Logo - Clicking it takes you home */}
+      <Link to="/" className="nav-brand" style={{ textDecoration: 'none' }}>
+        <img 
           src={cetso} 
           alt="CETSO Logo" 
           style={{ 
@@ -22,45 +21,45 @@ const Navbar: React.FC<NavbarProps> = ({ currentView, setView, user, logout }) =
             height: '40px', 
             borderRadius: '50%', 
             objectFit: 'cover',
-            border: '2px solid #ff6600' // Optional: adds an orange ring
+            border: '2px solid #ff6600' 
           }} 
         />
-  <span className="brand-orange" style={{ marginLeft: '10px' }}>CETSO</span> Portal
-</div>
+        <span className="brand-orange" style={{ marginLeft: '10px' }}>CETSO</span> Portal
+      </Link>
 
       <div className="nav-links">
-        {/* Public View Button */}
-        <button 
-          className={currentView === 'public' ? 'active' : ''} 
-          onClick={() => setView('public')}
+        {/* Public View NavLink */}
+        <NavLink 
+          to="/" 
+          className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
         >
           Public View
-        </button>
+        </NavLink>
 
         {/* Officer Controls */}
         {user ? (
           <>
-            <button 
-              className={currentView === 'dashboard' ? 'active' : ''} 
-              onClick={() => setView('dashboard')}
+            <NavLink 
+              to="/dashboard" 
+              className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
             >
               Dashboard
-            </button>
-            <button 
-              className={currentView === 'scanner' ? 'active' : ''} 
-              onClick={() => setView('scanner')}
+            </NavLink>
+            <NavLink 
+              to="/scanner" 
+              className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}
             >
               Scanner
-            </button>
+            </NavLink>
             <button className="btn-logout" onClick={logout}>Logout</button>
           </>
         ) : (
-          <button 
-            className={`btn-login ${currentView === 'login' ? 'active' : ''}`} 
-            onClick={() => setView('login')}
+          <NavLink 
+            to="/login" 
+            className={({ isActive }) => `btn-login nav-item ${isActive ? 'active' : ''}`}
           >
             Officer Login
-          </button>
+          </NavLink>
         )}
       </div>
     </nav>

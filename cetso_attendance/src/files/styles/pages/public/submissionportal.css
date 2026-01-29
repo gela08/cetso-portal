@@ -1,0 +1,128 @@
+/* --- TABS NAVIGATION --- */
+.portal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  background: #f1f2f6;
+  padding: 0.5rem;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  background: transparent;
+  font-weight: 700;
+  color: #636e72;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+  background: var(--cetso-white);
+  color: var(--cetso-orange);
+  box-shadow: var(--shadow);
+}
+
+.tab-btn:hover:not(.active) {
+  color: var(--cetso-black);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* --- SUGGESTION BOX STYLING --- */
+.suggestion-box-container {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.suggestion-header h3 {
+  font-size: 1.8rem;
+  color: var(--cetso-black);
+  margin-bottom: 0.5rem;
+}
+
+.suggestion-header p {
+  color: #636e72;
+  margin-bottom: 2.5rem;
+}
+
+.iframe-container {
+  background: #f8fafc;
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  border: 2px dashed #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  background: #fff4e5;
+  color: var(--cetso-orange);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.redirect-text {
+  font-weight: 500;
+  color: #4a5568;
+  max-width: 400px;
+}
+
+.btn-primary-form {
+  background: var(--cetso-orange);
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(238, 108, 77, 0.3);
+}
+
+.btn-primary-form:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(238, 108, 77, 0.4);
+}
+
+/* --- ANIMATIONS --- */
+.tab-content-fade {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- RESPONSIVENESS --- */
+@media (max-width: 600px) {
+  .portal-tabs {
+    width: 100%;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    padding: 0.8rem 0.5rem;
+    font-size: 0.85rem;
+    justify-content: center;
+  }
+
+  .tab-btn span {
+    display: none; /* Hide text on very small screens, keep icons */
+  }
+  
+  .tab-btn.active span {
+    display: inline; /* Show only active tab text */
+  }
+}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
-import { Info, Users, ClipboardList, MessageSquare } from 'lucide-react';
-import { Link } from 'react-router-dom'; // Assuming you use React Router
+import { Info, Users, ClipboardList, MessageSquare, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import '../styles/pages/public.css';
 
 interface SanctionTableProps {
@@ -12,17 +12,15 @@ interface SanctionTableProps {
 
 const SanctionTable: React.FC<SanctionTableProps> = ({ title, sanctionRules, loading }) => (
   <div className="public-section" style={{ marginBottom: '2.5rem' }}>
-    <h2 className="section-title-border">
-      {title}
-    </h2>
+    <h2 className="section-title-border">{title}</h2>
 
     <div className="card shadow-sm" style={{ overflow: 'hidden' }}>
       <div className="table-wrapper">
         <table className="modern-table">
           <thead>
             <tr>
-              <th style={{ width: '20%' }}>Absence Count</th>
-              <th style={{ width: '60%' }}>Required Item (Sanction)</th>
+              <th style={{ width: '25%' }}>Absence Count</th>
+              <th style={{ width: '55%' }}>Required Item (Sanction)</th>
               <th style={{ width: '20%' }}>Est. Price</th>
             </tr>
           </thead>
@@ -77,7 +75,7 @@ const PublicPage: React.FC = () => {
   const orientationRules = rules.filter(r => r.category === 'Orientation');
 
   return (
-    <div className="wide-container">
+    <div className="public-container">
       {/* --- HERO SECTION --- */}
       <header className="public-hero">
         <h1 className="hero-title">CETSO Student Portal</h1>
@@ -107,10 +105,10 @@ const PublicPage: React.FC = () => {
       <hr className="divider" />
 
       {/* --- SANCTION TABLES --- */}
-      <div className="rules-container">
-        <div className="section-header">
-          <Info size={24} className="text-orange" />
-          <h3>Official Sanction Guidelines</h3>
+      <div className="rules-container" style={{ marginTop: '3rem' }}>
+        <div className="section-header" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem' }}>
+          <Info size={24} style={{ color: 'var(--cetso-orange)' }} />
+          <h3 style={{ margin: 0, fontSize: '1.4rem', color: 'var(--cetso-black)' }}>Official Sanction Guidelines</h3>
         </div>
 
         <SanctionTable 
@@ -127,7 +125,7 @@ const PublicPage: React.FC = () => {
       </div>
 
       <div className="note-box">
-        <Info size={18} />
+        <AlertCircle size={20} />
         <p><strong>Note:</strong> These rules are approved by the CETSO body. Visit the office for specific attendance queries.</p>
       </div>
     </div>

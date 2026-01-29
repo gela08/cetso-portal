@@ -1,0 +1,60 @@
+/* Specific Styles for the College Officers Page */
+
+.college-officers-page {
+  padding-bottom: 4rem;
+}
+
+/* Header customization for this page */
+.page-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.page-header h1 {
+  color: var(--cetso-black);
+  font-size: 2.5rem;
+  font-weight: 800;
+  border-bottom: 5px solid var(--cetso-orange);
+  display: inline-block;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.page-header p {
+  color: #636e72;
+  font-size: 1.2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Specific Grid Layout for Officers */
+.officer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 3rem;
+  justify-content: center;
+  align-items: start;
+}
+
+/* Loading & Empty States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: var(--cetso-orange);
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .officer-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+}
