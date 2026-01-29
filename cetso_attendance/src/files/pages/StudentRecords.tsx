@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
-  UserPlus, Edit3, Trash2, Search, Filter, ArrowUpDown, Users, Download,
+  UserPlus, Edit3, Trash2, Search, Filter, ArrowUpDown, Users, Download, X
 } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
 import EditStudentInfo from '../components/EditStudentInfo';
@@ -32,10 +32,12 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
+  // Sync state with incoming props from parent
   useEffect(() => {
     setStudents(initialStudents);
   }, [initialStudents]);
 
+  // Filtering and Sorting Logic
   const displayStudents = useMemo(() => {
     const yearWeight: Record<string, number> = {
       '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4
@@ -47,8 +49,10 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
         const targetFilter = programFilter?.trim().toUpperCase() || 'ALL';
         const matchProgram = targetFilter === 'ALL' || currentProgram === targetFilter;
         const matchYear = yearFilter === 'ALL' || s.yearLevel === yearFilter;
+        
         const fullSearch = `${s.firstName} ${s.lastName} ${s.studentId} ${s.email}`.toLowerCase();
         const matchSearch = fullSearch.includes(searchQuery.toLowerCase().trim());
+        
         return matchProgram && matchYear && matchSearch;
       })
       .sort((a, b) => {
@@ -58,18 +62,21 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
       });
   }, [students, programFilter, yearFilter, searchQuery, sortBy]);
 
+  // --- SUPABASE ACTIONS ---
+
   const handleSave = async (studentData: any) => {
     // Mapping frontend names to Supabase snake_case columns
     const dbPayload = {
-      student_id: studentData.student_id || studentData.studentId,
-      first_name: studentData.first_name || studentData.firstName,
-      last_name: studentData.last_name || studentData.lastName,
+      student_id: studentData.studentId || studentData.student_id,
+      first_name: studentData.firstName || studentData.first_name,
+      last_name: studentData.lastName || studentData.last_name,
       email: studentData.email,
-      year_level: studentData.student_level || studentData.yearLevel,
+      year_level: studentData.yearLevel || studentData.year_level,
       program: studentData.program
     };
 
     if (selectedStudent) {
+      // UPDATE existing record
       const { error } = await supabase
         .from('students')
         .update(dbPayload)
@@ -77,6 +84,7 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
       
       if (error) return alert("Update failed: " + error.message);
     } else {
+      // CREATE new record
       const { error } = await supabase
         .from('students')
         .insert([dbPayload]);
@@ -107,6 +115,15 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
 
       if (error) alert("Bulk delete failed: " + error.message);
       else setSelectedIds([]);
+    }
+  };
+
+  // --- UI HELPERS ---
+  const toggleSelectAll = () => {
+    if (selectedIds.length === displayStudents.length && displayStudents.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(displayStudents.map(s => s.studentId));
     }
   };
 
@@ -159,6 +176,11 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
+            {searchQuery && (
+              <button className="search-clear-btn" onClick={() => setSearchQuery('')} title="Clear search">
+                <X size={14} />
+              </button>
+            )}
           </div>
 
           <div className="filter-group">
@@ -191,10 +213,7 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
                 <input 
                   type="checkbox" 
                   checked={selectedIds.length === displayStudents.length && displayStudents.length > 0}
-                  onChange={() => {
-                    if (selectedIds.length === displayStudents.length) setSelectedIds([]);
-                    else setSelectedIds(displayStudents.map(s => s.studentId));
-                  }}
+                  onChange={toggleSelectAll}
                 />
               </th>
               <th>Student ID</th>
@@ -241,7 +260,7 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
               ))
             ) : (
               <tr>
-                <td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+                <td colSpan={8} className="empty-state-cell">
                   No students found matching your filters.
                 </td>
               </tr>
