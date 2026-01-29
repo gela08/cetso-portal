@@ -1,0 +1,209 @@
+/* suggestiontab.css */
+
+:root {
+  --cetso-orange: #FF4500;
+  --cetso-navy: #002147;
+  --cetso-gold: #FFD700;
+}
+
+.suggestion-tab-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+}
+
+.feedback-card-container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 2.5rem;
+  border: 1px solid #e2e8f0;
+  border-top: 6px solid var(--cetso-orange); 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.feedback-hero-layout {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+  width: 100%;
+}
+
+.qr-container {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1.5px dashed #cbd5e1;
+}
+
+.qr-label {
+  font-size: 0.75rem;
+  color: var(--cetso-navy);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feedback-badge {
+  background: var(--cetso-gold);
+  color: var(--cetso-navy);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.feedback-text-content h3 {
+  font-size: 2.2rem;
+  color: var(--cetso-navy);
+  margin-bottom: 0.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.suggestion-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--cetso-navy);
+  color: #ffffff;
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  margin-top: 20px;
+}
+
+.suggestion-submit-btn:hover {
+  background-color: var(--cetso-orange);
+  transform: translateY(-2px);
+}
+
+.data-privacy-notice {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #64748b;
+  border-left: 4px solid var(--cetso-gold);
+}
+
+.feedback-faq-section {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 2rem;
+  /* Prevent Copying */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.faq-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  color: var(--cetso-navy);
+}
+
+.faq-grid {
+  display: flex;
+  flex-direction: column; /* Stacked look works better for accordions */
+  gap: 1rem;
+}
+
+.faq-item {
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-item:hover {
+  border-color: var(--cetso-orange);
+}
+
+.faq-question {
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+}
+
+.faq-question h5 {
+  margin: 0;
+  color: var(--cetso-navy);
+  font-weight: 700;
+}
+
+.faq-chevron {
+  font-weight: bold;
+  color: var(--cetso-orange);
+  font-size: 1.2rem;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out, padding 0.3s ease;
+  background: #fcfcfc;
+}
+
+.faq-item.active .faq-answer {
+  max-height: 200px; /* Adjust based on content length */
+  padding: 0 1.25rem 1.25rem 1.25rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.faq-answer p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  cursor: default; /* Arrow cursor for text */
+}
+
+@media (max-width: 768px) {
+  .feedback-hero-layout {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* suggestiontab.css */
+
+/* ... existing styles ... */
+
+.feedback-faq-section {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 2rem;
+  
+  /* Prevents text selection and copying */
+  user-select: none; 
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE10+/Edge */
+}
+
+/* Optional: Keep the cursor as a default pointer so it doesn't 
+   look like the text is interactable */
+.feedback-faq-section p, 
+.feedback-faq-section h4, 
+.feedback-faq-section h5 {
+  cursor: default;
+}

@@ -9,7 +9,8 @@ import {
   ChevronRight, 
   TrendingUp, 
   Clock,
-  Activity
+  Activity,
+  MessageSquare
 } from 'lucide-react';
 import { 
   PieChart, 
@@ -22,6 +23,7 @@ import {
 
 import StudentRecords from './StudentRecords';
 import SanctionList from './SanctionList';
+import RequestManager from './RequestManager'; // Ensure this component exists
 import ProgramView from '../components/ProgramView';
 import '../styles/pages/dashboard.css';
 
@@ -33,30 +35,24 @@ interface DashboardProps {
 
 const COLORS = ['#ff6600', '#1a1a1a', '#475569', '#94a3b8'];
 
-// --- Sub-Component: The New Dashboard Home View ---
+// --- Sub-Component: The Dashboard Home View ---
 const DashboardHome = ({ students, logs }: { students: any[], logs: any[] }) => {
-  
-  // 1. Calculate Population by Program
   const programStats = useMemo(() => {
     const counts: Record<string, number> = { BLIS: 0, BSCpE: 0, BSECE: 0, BSIT: 0 };
     students.forEach(s => {
       if (counts[s.program] !== undefined) counts[s.program]++;
     });
-    return Object.keys(counts).map(key => ({ name: key, value: counts[key] }));
+    return Object.keys(counts).map((key, index) => ({ name: key, value: counts[key], index }));
   }, [students]);
 
-  // 2. Get Recent Activity (Last 5 logs)
   const recentLogs = useMemo(() => {
     return [...logs].reverse().slice(0, 5);
   }, [logs]);
 
-  // 3. Calculate "Currently In Campus" (Simple logic: Logged In > Logged Out)
-  // *Note: This depends on your log logic, simplistic version here*
   const currentIn = logs.filter(l => l.status === 'in').length; 
 
   return (
     <div className="dashboard-home-grid">
-      {/* Top Stats Row */}
       <div className="stats-row">
         <div className="stat-card highlight">
           <div className="stat-icon-bg"><Users size={24} color="#ff6600"/></div>
@@ -81,9 +77,7 @@ const DashboardHome = ({ students, logs }: { students: any[], logs: any[] }) => 
         </div>
       </div>
 
-      {/* Charts Row */}
       <div className="charts-grid">
-        {/* Chart 1: Population Distribution */}
         <div className="chart-card">
           <h3>Population Distribution</h3>
           <div style={{ width: '100%', height: 250 }}>
@@ -91,14 +85,11 @@ const DashboardHome = ({ students, logs }: { students: any[], logs: any[] }) => 
               <PieChart>
                 <Pie
                   data={programStats}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
+                  cx="50%" cy="50%"
+                  innerRadius={60} outerRadius={80}
+                  paddingAngle={5} dataKey="value"
                 >
-                  {programStats.map(( index: any) => (
+                  {programStats.map((index : any) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -109,7 +100,6 @@ const DashboardHome = ({ students, logs }: { students: any[], logs: any[] }) => 
           </div>
         </div>
 
-        {/* Chart 2: Recent Activity Feed */}
         <div className="chart-card">
           <h3>Recent Activity</h3>
           <div className="recent-activity-list">
@@ -150,19 +140,13 @@ const DashboardPage: React.FC<DashboardProps> = ({ attendance, dbStudents }) => 
     switch (activeTab) {
       case 'records': 
         return <StudentRecords initialStudents={dbStudents} programFilter={programFilter} />;
-      
       case 'sanctions': 
         return <SanctionList students={dbStudents} attendance={attendance} />;
-      
+      case 'requests':
+        return <RequestManager />;
       case 'logs': 
-        return <ProgramView 
-                  program={programFilter} 
-                  students={dbStudents} 
-                  attendance={attendance} 
-                />;
-      
+        return <ProgramView program={programFilter} students={dbStudents} attendance={attendance} />;
       default:
-        // Use the new Sub-Component here
         return <DashboardHome students={dbStudents} logs={attendance} />;
     }
   };
@@ -199,6 +183,12 @@ const DashboardPage: React.FC<DashboardProps> = ({ attendance, dbStudents }) => 
               <Users size={18}/> Student Records
             </button>
             <button 
+              className={`nav-link ${activeTab === 'requests' ? 'active' : ''}`} 
+              onClick={() => {setActiveTab('requests'); setProgramFilter('ALL'); setIsSidebarOpen(false);}}
+            >
+              <MessageSquare size={18}/> Requests
+            </button>
+            <button 
               className={`nav-link ${activeTab === 'sanctions' ? 'active' : ''}`} 
               onClick={() => {setActiveTab('sanctions'); setIsSidebarOpen(false);}}
             >
@@ -229,7 +219,7 @@ const DashboardPage: React.FC<DashboardProps> = ({ attendance, dbStudents }) => 
           </button>
           <div className="header-title">
             <h1>
-              {activeTab === 'logs' ? `${programFilter} Department` : activeTab === 'dashboard' ? 'Overview' : activeTab.toUpperCase()}
+              {activeTab === 'logs' ? `${programFilter} Dept` : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
             </h1>
             <p>Welcome back, Admin</p>
           </div>
