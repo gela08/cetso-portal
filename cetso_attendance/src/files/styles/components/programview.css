@@ -1,0 +1,233 @@
+/* --- PROGRAM VIEW SPECIFIC STYLES --- */
+
+.program-view-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Header Area */
+.program-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.program-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 8px 0;
+}
+
+.program-badges {
+  display: flex;
+  gap: 10px;
+}
+
+.p-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.p-badge.orange { background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
+.p-badge.green { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
+
+/* Export Button */
+.btn-export {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-export:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1a1a1a;
+  transform: translateY(-1px);
+}
+
+/* --- YEAR LEVEL GRID (Masonry-ish) --- */
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.year-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 400px; /* Fixed height for scrolling tables */
+}
+
+.year-card-header {
+  padding: 1rem 1.25rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.year-card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.count-bubble {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* Mini Tables inside Cards */
+.table-wrapper {
+  flex: 1;
+  overflow-y: auto; /* Allows scrolling inside the card */
+}
+
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.mini-table th {
+  text-align: left;
+  padding: 10px 1.25rem;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  background: white;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.mini-table td {
+  padding: 10px 1.25rem;
+  border-bottom: 1px solid #f8fafc;
+  color: #334155;
+}
+
+/* Status Dot in Mini Table */
+.status-dot {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.status-dot.active { background: #fff1f2; color: #be123c; }
+.status-dot.cleared { background: #f0fdf4; color: #15803d; }
+
+.text-red { color: #dc2626; font-weight: 700; }
+.text-gray { color: #cbd5e1; }
+
+/* Divider */
+.divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 1rem 0;
+}
+
+/* --- ACTIVITY LOGS TABLE --- */
+.logs-section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.logs-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logs-header h3 { margin: 0; font-size: 1.1rem; color: #1a1a1a; }
+.text-orange { color: #ff6600; }
+
+.main-table-container {
+  overflow-x: auto;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.modern-table th {
+  text-align: left;
+  padding: 1rem;
+  background: #1a1a1a; /* Black Header */
+  color: white;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.modern-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: #475569;
+}
+
+.modern-table tr:hover { background: #f8fafc; }
+
+/* Table Typography */
+.timestamp { display: flex; flex-direction: column; line-height: 1.2; }
+.date-small { font-size: 0.75rem; color: #94a3b8; }
+.mono-text { font-family: 'Courier New', monospace; letter-spacing: -0.5px; color: #334155; }
+.font-bold { font-weight: 600; color: #1a1a1a; }
+
+/* IN/OUT Pills */
+.pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.pill-in { background: #dcfce7; color: #166534; }
+.pill-out { background: #fee2e2; color: #991b1b; }
+
+.empty-row, .empty-state {
+  text-align: center;
+  color: #94a3b8;
+  padding: 2rem;
+  font-style: italic;
+}

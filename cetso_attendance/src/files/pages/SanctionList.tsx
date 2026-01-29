@@ -1,34 +1,36 @@
 import { useState, useMemo } from 'react';
-import { Info, Download, AlertCircle } from 'lucide-react';
+import { Info, Download, Search, Filter, Users } from 'lucide-react';
 import { calculateSanctions } from '../utils/SanctionLogic';
 import { SANCTION_RULES } from '../utils/Data';
 import { exportToExcel } from '../utils/SanctionExport';
+import ExportSanctionModal from '../components/ExportSanctionModal';
+
 import '../styles/pages/sanctionlist.css';
+import '../styles/pages/studentrecords.css';
 
 const PROGRAMS = ['BSIT', 'BLIS', 'BSCpE', 'BSECE'];
 const YEAR_LEVELS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
 
 const SanctionList = ({ students, attendance, activeEvent }: any) => {
   const [activeProgram, setActiveProgram] = useState('BSIT');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [yearFilter, setYearFilter] = useState('ALL');
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // 1. Determine requirements based on event
   const currentEvent = activeEvent || 'Intramurals';
   const totalRequired = currentEvent === 'Orientation' ? 2 : 12;
 
-  // 2. Memoized Calculation (Handling Supabase snake_case)
   const filteredData = useMemo(() => {
     const relevantRules = SANCTION_RULES.filter(rule => rule.category === currentEvent);
-    
-    // We map the database data to what the logic expects, or update logic to handle both
-    const rawData = calculateSanctions(
-      students,
-      attendance,
-      totalRequired,
-      relevantRules
-    );
+    const rawData = calculateSanctions(students, attendance, totalRequired, relevantRules);
 
-    return rawData.filter((s: any) => s.program === activeProgram);
-  }, [students, attendance, totalRequired, currentEvent, activeProgram]);
+    return rawData.filter((s: any) => {
+      const matchProgram = s.program === activeProgram;
+      const matchYear = yearFilter === 'ALL' || (s.year_level || s.yearLevel) === yearFilter;
+      const fullSearch = `${s.first_name} ${s.last_name} ${s.student_id} ${s.email || ''}`.toLowerCase();
+      return matchProgram && matchYear && fullSearch.includes(searchQuery.toLowerCase().trim());
+    });
+  }, [students, attendance, totalRequired, currentEvent, activeProgram, yearFilter, searchQuery]);
 
   return (
     <div className="sanction-wrapper">
@@ -44,82 +46,90 @@ const SanctionList = ({ students, attendance, activeEvent }: any) => {
         ))}
       </div>
 
-      <div className="sanction-container">
-        <div className="sanction-info-bar">
-          <div className="info-meta">
-            <Info size={18} className="info-icon" />
-            <span className="filter-label">
-              <strong>{activeProgram}</strong> Sanctions 
-              <span className="divider">|</span>
-              Event: <strong>{currentEvent}</strong>
-              <span className="divider">|</span>
-              Required Logs: <strong>{totalRequired}</strong>
-            </span>
+      <div className="table-card">
+        <div className="card-header">
+          <div className="header-top-row">
+            <div className="title-group">
+              <h3 className="section-title">{activeProgram} Sanctions</h3>
+              <span className="count-badge">
+                <Users size={14} /> {filteredData.length} Students
+              </span>
+            </div>
+            <div className="action-buttons-group">
+              <button className="btn-export" onClick={() => setIsExportModalOpen(true)}>
+                <Download size={18} /> <span className="btn-text">Export Records</span>
+              </button>
+            </div>
           </div>
-          
-          <button 
-            className="export-btn" 
-            onClick={() => exportToExcel(filteredData, activeProgram)}
-            disabled={filteredData.length === 0}
-          >
-            <Download size={16} /> Export to Excel
-          </button>
+
+          <div className="header-controls">
+            <div className="search-container">
+              <Search size={16} className="search-icon" />
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+            </div>
+            <div className="filter-group">
+              <Filter size={16} className="filter-icon" />
+              <select value={yearFilter} onChange={(e) => setYearFilter(e.target.value)} className="filter-select">
+                <option value="ALL">All Years View</option>
+                {YEAR_LEVELS.map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
+          </div>
         </div>
 
-        {YEAR_LEVELS.map((year) => {
-          // Note: s.year_level or s.yearLevel depending on how your Logic helper returns it
-          const yearData = filteredData
-            .filter((s: any) => (s.year_level || s.yearLevel) === year)
-            .sort((a: any, b: any) => (a.last_name || a.lastName).localeCompare(b.last_name || b.lastName));
+        <div className="sanction-info-bar">
+          <Info size={16} />
+          <span>Event: <strong>{currentEvent}</strong> | Required: <strong>{totalRequired} Logs</strong></span>
+        </div>
 
-          return (
-            <div key={year} className="year-section">
-              <div className="year-header">
-                <h3>{year}</h3>
-                <span className="count-badge">{yearData.length} Students</span>
-              </div>
-              
-              <div className="table-responsive">
-                <table className="modern-table">
-                  <thead>
-                    <tr>
-                      <th style={{ width: '50px' }}>#</th>
-                      <th style={{ width: '120px' }}>Student ID</th>
-                      <th>Last Name</th>
-                      <th>First Name</th>
-                      <th>Absences</th>
-                      <th>Sanction Item</th>
-                      <th style={{ width: '100px' }}>Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {yearData.length > 0 ? (
-                      yearData.map((s: any, i: number) => (
-                        <tr key={s.student_id || s.studentId}>
-                          <td className="row-index">{i + 1}</td>
-                          <td className="mono-text">{s.student_id || s.studentId}</td>
-                          <td className="name-cell">{s.last_name || s.lastName}</td>
-                          <td className="name-cell">{s.first_name || s.firstName}</td>
+        <div className="year-sections-container">
+          {YEAR_LEVELS.filter(y => yearFilter === 'ALL' || y === yearFilter).map((year) => {
+            const yearData = filteredData.filter((s: any) => (s.year_level || s.yearLevel) === year);
+            if (yearData.length === 0) return null;
+            return (
+              <div key={year} className="year-section">
+                <div className="year-header"><h3>{year}</h3></div>
+                <div className="table-responsive">
+                  <table className="modern-table">
+                    <thead>
+                      <tr>
+                        <th>#</th><th>Student ID</th><th>Full Name</th><th>Absences</th><th>Sanction</th><th>Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {yearData.map((s: any, i: number) => (
+                        <tr key={s.student_id}>
+                          <td>{i + 1}</td>
+                          <td>{s.student_id}</td>
+                          <td className="font-bold">{s.last_name}, {s.first_name}</td>
                           <td><span className="absences-cell">{s.absences}</span></td>
-                          <td><span className="item-name">{s.item}</span></td>
+                          <td><span className="program-tag">{s.item}</span></td>
                           <td><span className="price-tag">₱{s.price}</span></td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={7} className="empty-state">
-                          <AlertCircle size={18} />
-                          <span>No students found with absences in {year}.</span>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
+
+      <ExportSanctionModal 
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        activeProgram={activeProgram}
+        filteredData={filteredData}
+        yearLevels={YEAR_LEVELS}
+        onExport={exportToExcel}
+      />
     </div>
   );
 };

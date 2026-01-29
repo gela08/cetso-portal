@@ -1,19 +1,17 @@
 import * as XLSX from 'xlsx';
 
 export const exportToExcel = (data: any[], programName: string) => {
-  // 1. Sort the data by Year Level (Ascending)
-  // We use localeCompare with numeric: true to handle "1st", "2nd", etc., correctly
   const sortedData = [...data].sort((a, b) => 
-    String(a.yearLevel).localeCompare(String(b.yearLevel), undefined, { numeric: true })
+    String(a.year_level || a.yearLevel).localeCompare(String(b.year_level || b.yearLevel), undefined, { numeric: true })
   );
 
-  // 2. Prepare the data for Excel (Mapping headers)
   const excelData = sortedData.map((s, index) => ({
-    'No.': index + 1, // Numbering follows the new sorted order
-    'Student ID': s.studentId,
-    'Last Name': s.lastName,
-    'First Name': s.firstName,
-    'Year Level': s.yearLevel,
+    'No.': index + 1,
+    'Student ID': s.student_id || s.studentId,
+    'Last Name': s.last_name || s.lastName,
+    'First Name': s.first_name || s.firstName,
+    'Email': s.email || 'N/A', // ADDED EMAIL
+    'Year Level': s.year_level || s.yearLevel,
     'Program': s.program,
     'Absences': s.absences,
     'Sanction Item': s.item,

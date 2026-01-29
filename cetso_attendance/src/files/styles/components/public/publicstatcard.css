@@ -1,0 +1,33 @@
+.stat-card-public {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-left: 5px solid transparent;
+}
+
+.stat-card-public.orange { border-left-color: #ee6c4d; }
+.stat-card-public.blue { border-left-color: #3d5a80; }
+
+.stat-icon-wrapper {
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  color: #3d5a80;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+  color: #212529;
+}

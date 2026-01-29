@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabaseClient';
+import { Info, Users, ClipboardList, MessageSquare } from 'lucide-react';
+import { Link } from 'react-router-dom'; // Assuming you use React Router
 import '../styles/pages/public.css';
 
 interface SanctionTableProps {
@@ -10,17 +12,11 @@ interface SanctionTableProps {
 
 const SanctionTable: React.FC<SanctionTableProps> = ({ title, sanctionRules, loading }) => (
   <div className="public-section" style={{ marginBottom: '2.5rem' }}>
-    <h2 style={{ 
-      color: '#333', 
-      fontSize: '1.5rem', 
-      borderLeft: '5px solid #ff6600', 
-      paddingLeft: '15px',
-      marginBottom: '1rem' 
-    }}>
+    <h2 className="section-title-border">
       {title}
     </h2>
 
-    <div className="card" style={{ overflow: 'hidden' }}>
+    <div className="card shadow-sm" style={{ overflow: 'hidden' }}>
       <div className="table-wrapper">
         <table className="modern-table">
           <thead>
@@ -37,11 +33,10 @@ const SanctionTable: React.FC<SanctionTableProps> = ({ title, sanctionRules, loa
               sanctionRules.map((rule, index) => (
                 <tr key={index}>
                   <td style={{ fontWeight: 'bold' }}>
-                    {/* Using min_absences from Supabase */}
                     {rule.min_absences} {rule.min_absences === 1 ? 'Absence' : 'Absences'}
                   </td>
                   <td style={{ whiteSpace: 'pre-line' }}>{rule.item}</td>
-                  <td style={{ color: '#B91C1C', fontWeight: 'bold' }}>₱{rule.price}</td>
+                  <td className="text-red-bold">₱{rule.price}</td>
                 </tr>
               ))
             ) : (
@@ -66,7 +61,7 @@ const PublicPage: React.FC = () => {
     const fetchRules = async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from('sanction_rules') // Make sure this matches your Supabase table name
+        .from('sanction_rules')
         .select('*')
         .order('min_absences', { ascending: true });
 
@@ -78,31 +73,62 @@ const PublicPage: React.FC = () => {
     fetchRules();
   }, []);
 
-  // Filter rules by category (Event Name)
   const intramuralRules = rules.filter(r => r.category === 'Intramurals');
   const orientationRules = rules.filter(r => r.category === 'Orientation');
 
   return (
     <div className="wide-container">
-      <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ color: '#ff6600', fontSize: '2.5rem' }}>Sanctions & Requirements</h1>
-        <p>College of Engineering and Technology Students Organization</p>
+      {/* --- HERO SECTION --- */}
+      <header className="public-hero">
+        <h1 className="hero-title">CETSO Student Portal</h1>
+        <p className="hero-subtitle">College of Engineering and Technology Students Organization</p>
       </header>
 
-      <SanctionTable 
-        title="Intramurals/Fiesta 2025" 
-        sanctionRules={intramuralRules} 
-        loading={loading}
-      />
+      {/* --- NAVIGATION GRID --- */}
+      <div className="public-nav-grid">
+        <Link to="/public/college-officers" className="nav-card">
+          <Users size={32} />
+          <span>College Officers</span>
+        </Link>
+        <Link to="/public/program-officers" className="nav-card">
+          <Users size={32} />
+          <span>Program Officers</span>
+        </Link>
+        <Link to="/public/sanctions" className="nav-card">
+          <ClipboardList size={32} />
+          <span>Sanction List</span>
+        </Link>
+        <Link to="/public/submissions" className="nav-card">
+          <MessageSquare size={32} />
+          <span>Submit Request</span>
+        </Link>
+      </div>
 
-      <SanctionTable 
-        title="1st Sem Orientation" 
-        sanctionRules={orientationRules} 
-        loading={loading}
-      />
+      <hr className="divider" />
 
-      <div className="note-box" style={{ marginTop: '2rem', padding: '1rem', background: '#eee', borderRadius: '8px' }}>
-        <strong>Note:</strong> Visit the CETSO office for personal attendance queries.
+      {/* --- SANCTION TABLES --- */}
+      <div className="rules-container">
+        <div className="section-header">
+          <Info size={24} className="text-orange" />
+          <h3>Official Sanction Guidelines</h3>
+        </div>
+
+        <SanctionTable 
+          title="Intramurals/Fiesta 2025" 
+          sanctionRules={intramuralRules} 
+          loading={loading}
+        />
+
+        <SanctionTable 
+          title="1st Sem Orientation" 
+          sanctionRules={orientationRules} 
+          loading={loading}
+        />
+      </div>
+
+      <div className="note-box">
+        <Info size={18} />
+        <p><strong>Note:</strong> These rules are approved by the CETSO body. Visit the office for specific attendance queries.</p>
       </div>
     </div>
   );

@@ -1,0 +1,72 @@
+.request-form-ui {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-item label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #3d5a80;
+}
+
+.form-item input, 
+.form-item select, 
+.form-item textarea {
+  padding: 0.8rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-item input:focus, 
+.form-item textarea:focus {
+  outline: none;
+  border-color: #ee6c4d;
+}
+
+.btn-primary-form {
+  background: #ee6c4d;
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-primary-form:disabled {
+  background: #ccc;
+}
+
+.form-success {
+  text-align: center;
+  padding: 3rem;
+  background: #f0fff4;
+  border-radius: 12px;
+  border: 1px solid #c6f6d5;
+}
+
+@media (max-width: 600px) {
+  .input-grid {
+    grid-template-columns: 1fr;
+  }
+}

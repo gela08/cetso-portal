@@ -1,17 +1,144 @@
-import React, { useState } from 'react';
-import { LayoutDashboard, Users, Scale, ClipboardList, Menu, X, ChevronRight, Database } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { 
+  LayoutDashboard, 
+  Users, 
+  Scale, 
+  ClipboardList, 
+  Menu, 
+  X, 
+  ChevronRight, 
+  TrendingUp, 
+  Clock,
+  Activity
+} from 'lucide-react';
+import { 
+  PieChart, 
+  Pie, 
+  Cell, 
+  ResponsiveContainer, 
+  Tooltip, 
+  Legend 
+} from 'recharts';
+
 import StudentRecords from './StudentRecords';
 import SanctionList from './SanctionList';
 import ProgramView from '../components/ProgramView';
-import { DatabaseAdmin } from '../utils/DatabaseAdmin'; // Import the tool created earlier
 import '../styles/pages/dashboard.css';
 
 interface DashboardProps {
   attendance: any[];
   setAttendance: any;
-  dbStudents: any[]; // New prop for live database students
+  dbStudents: any[];
 }
 
+const COLORS = ['#ff6600', '#1a1a1a', '#475569', '#94a3b8'];
+
+// --- Sub-Component: The New Dashboard Home View ---
+const DashboardHome = ({ students, logs }: { students: any[], logs: any[] }) => {
+  
+  // 1. Calculate Population by Program
+  const programStats = useMemo(() => {
+    const counts: Record<string, number> = { BLIS: 0, BSCpE: 0, BSECE: 0, BSIT: 0 };
+    students.forEach(s => {
+      if (counts[s.program] !== undefined) counts[s.program]++;
+    });
+    return Object.keys(counts).map(key => ({ name: key, value: counts[key] }));
+  }, [students]);
+
+  // 2. Get Recent Activity (Last 5 logs)
+  const recentLogs = useMemo(() => {
+    return [...logs].reverse().slice(0, 5);
+  }, [logs]);
+
+  // 3. Calculate "Currently In Campus" (Simple logic: Logged In > Logged Out)
+  // *Note: This depends on your log logic, simplistic version here*
+  const currentIn = logs.filter(l => l.status === 'in').length; 
+
+  return (
+    <div className="dashboard-home-grid">
+      {/* Top Stats Row */}
+      <div className="stats-row">
+        <div className="stat-card highlight">
+          <div className="stat-icon-bg"><Users size={24} color="#ff6600"/></div>
+          <div>
+            <span className="stat-label">TOTAL STUDENTS</span>
+            <h2 className="stat-value">{students.length}</h2>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon-bg"><Activity size={24} color="#1a1a1a"/></div>
+          <div>
+            <span className="stat-label">TOTAL LOGS</span>
+            <h2 className="stat-value">{logs.length}</h2>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon-bg"><TrendingUp size={24} color="#166534"/></div>
+          <div>
+            <span className="stat-label">CURRENTLY ACTIVE</span>
+            <h2 className="stat-value">{currentIn} <span style={{fontSize:'0.8rem', color:'#999'}}>approx</span></h2>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Row */}
+      <div className="charts-grid">
+        {/* Chart 1: Population Distribution */}
+        <div className="chart-card">
+          <h3>Population Distribution</h3>
+          <div style={{ width: '100%', height: 250 }}>
+            <ResponsiveContainer>
+              <PieChart>
+                <Pie
+                  data={programStats}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {programStats.map(( index: any) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Chart 2: Recent Activity Feed */}
+        <div className="chart-card">
+          <h3>Recent Activity</h3>
+          <div className="recent-activity-list">
+            {recentLogs.length === 0 ? (
+              <p className="no-data">No logs recorded yet.</p>
+            ) : (
+              recentLogs.map((log, idx) => (
+                <div key={idx} className="activity-item">
+                  <div className={`status-indicator ${log.status === 'in' ? 'bg-green' : 'bg-red'}`}>
+                    {log.status === 'in' ? 'IN' : 'OUT'}
+                  </div>
+                  <div className="activity-details">
+                    <span className="activity-id">{log.studentId || "Unknown ID"}</span>
+                    <span className="activity-time">
+                      <Clock size={12} style={{marginRight: 4}}/>
+                      {log.timestamp || "Just now"}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Main Page Component ---
 const DashboardPage: React.FC<DashboardProps> = ({ attendance, dbStudents }) => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [programFilter, setProgramFilter] = useState('ALL');
@@ -34,22 +161,9 @@ const DashboardPage: React.FC<DashboardProps> = ({ attendance, dbStudents }) => 
                   attendance={attendance} 
                 />;
       
-      case 'admin':
-        return <DatabaseAdmin />;
-
       default:
-        return (
-          <div className="stats-grid">
-            <div className="stat-card highlight">
-              <span className="stat-label">TOTAL POPULATION</span>
-              <h2 className="stat-value">{dbStudents.length}</h2>
-            </div>
-            <div className="stat-card">
-              <span className="stat-label">TOTAL LOGS</span>
-              <h2 className="stat-value">{attendance.length}</h2>
-            </div>
-          </div>
-        );
+        // Use the new Sub-Component here
+        return <DashboardHome students={dbStudents} logs={attendance} />;
     }
   };
 
@@ -105,16 +219,6 @@ const DashboardPage: React.FC<DashboardProps> = ({ attendance, dbStudents }) => 
               </button>
             ))}
           </div>
-
-          {/* New Admin Section */}
-          <div className="nav-section" style={{ marginTop: 'auto', borderTop: '1px solid #eee', paddingTop: '10px' }}>
-            <button 
-              className={`nav-link ${activeTab === 'admin' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('admin'); setIsSidebarOpen(false); }}
-            >
-              <Database size={18}/> Database Admin
-            </button>
-          </div>
         </nav>
       </aside>
 
@@ -125,7 +229,7 @@ const DashboardPage: React.FC<DashboardProps> = ({ attendance, dbStudents }) => 
           </button>
           <div className="header-title">
             <h1>
-              {activeTab === 'logs' ? `${programFilter} Department` : activeTab.toUpperCase()}
+              {activeTab === 'logs' ? `${programFilter} Department` : activeTab === 'dashboard' ? 'Overview' : activeTab.toUpperCase()}
             </h1>
             <p>Welcome back, Admin</p>
           </div>
