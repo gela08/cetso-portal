@@ -7,6 +7,9 @@
   --bg-surface: #ffffff;
   --border-color: #d1d5db;
   --radius: 8px;
+  /* Added specific status colors */
+  --success-green: #22c55e;
+  --error-red: #ef4444;
 }
 
 /* --- Modal Overlay --- */
@@ -16,8 +19,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Dimmed background */
-  backdrop-filter: blur(4px); /* Glassmorphism effect */
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -37,12 +40,12 @@
   flex-direction: column;
   overflow: hidden;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  border-top: 5px solid var(--cetso-orange); /* Theme Accent */
+  border-top: 5px solid var(--cetso-orange);
 }
 
 /* --- Header --- */
 .modal-header {
-  padding: 24px 24px 0 24px; /* No bottom padding */
+  padding: 24px 24px 0 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -94,6 +97,31 @@ form {
   gap: 16px;
 }
 
+/* --- NEW: Input with Icon Container --- */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon input {
+  padding-right: 40px; /* Leave space for the icon */
+}
+
+.icon-success {
+  position: absolute;
+  right: 12px;
+  color: var(--success-green);
+  animation: fadeIn 0.2s ease-in;
+}
+
+.icon-error {
+  position: absolute;
+  right: 12px;
+  color: var(--error-red);
+  animation: fadeIn 0.2s ease-in;
+}
+
 /* --- Labels & Inputs --- */
 label {
   font-size: 0.875rem;
@@ -109,10 +137,10 @@ select {
   font-size: 0.95rem;
   color: var(--cetso-dark);
   background-color: white;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
   outline: none;
-  width: 100%; /* Ensure they fill the container */
-  box-sizing: border-box; /* Fix padding calculation */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 input:focus,
@@ -121,15 +149,36 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
+/* --- NEW: Validation Status States --- */
+input.valid {
+  border-color: var(--success-green);
+}
+
+input.valid:focus {
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+input.invalid {
+  border-color: var(--error-red);
+}
+
+input.invalid:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.error-text {
+  color: var(--error-red);
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* --- Input States --- */
 input:disabled {
   background-color: #f3f4f6;
   color: #9ca3af;
   cursor: not-allowed;
   border-color: #e5e7eb;
-}
-
-input::placeholder {
-  color: #d1d5db;
 }
 
 /* --- Footer Actions --- */
@@ -153,9 +202,11 @@ button.btn-secondary {
   transition: all 0.2s;
 }
 
-button.btn-secondary:hover {
-  background-color: #f9fafb;
-  border-color: #9ca3af;
+/* --- NEW: Disabled State for Primary Button --- */
+button.btn-primary:disabled {
+  background-color: #d1d5db;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 button.btn-primary {
@@ -166,11 +217,11 @@ button.btn-primary {
   border-radius: var(--radius);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
   box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
 }
 
-button.btn-primary:hover {
+button.btn-primary:hover:not(:disabled) {
   background-color: var(--cetso-orange-hover);
 }
 
@@ -194,13 +245,13 @@ button.btn-primary:hover {
 /* --- Mobile Responsiveness --- */
 @media (max-width: 640px) {
   .form-row {
-    grid-template-columns: 1fr; /* Stack inputs on small screens */
+    grid-template-columns: 1fr;
     gap: 16px;
   }
   
   .modal-content {
-    width: 95%; /* Add some margin on sides */
-    max-height: 90vh; /* Prevent overflowing screen height */
-    overflow-y: auto; /* Scroll if content is too tall */
+    width: 95%;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 }

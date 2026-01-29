@@ -1,17 +1,18 @@
 import { useState, useEffect, useMemo } from 'react';
 import { 
-  UserPlus, Edit3, Trash2, Search, Filter, ArrowUpDown, Users, Download, X
+  UserPlus, Edit3, Trash2, Search, Filter, ArrowUpDown, Users, Download,
 } from 'lucide-react';
 import { supabase } from '../utils/supabaseClient';
 import EditStudentInfo from '../components/EditStudentInfo';
 import '../styles/pages/studentrecords.css';
 
+// 1. Interface matched exactly to Supabase Columns
 export interface Student {
-  studentId: number;
-  firstName: string;
-  lastName: string;
+  student_id: number;   
+  first_name: string;   
+  last_name: string;    
   email: string;
-  yearLevel: string;
+  year_level: string;   
   program: string;
 }
 
@@ -20,24 +21,24 @@ interface Props {
   programFilter: string;
 }
 
-type SortOption = 'lastName' | 'studentId' | 'yearLevel';
+// 2. Sort options matched to snake_case keys
+type SortOption = 'last_name' | 'student_id' | 'year_level';
 
 const StudentRecords = ({ initialStudents, programFilter }: Props) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [yearFilter, setYearFilter] = useState('ALL');
-  const [sortBy, setSortBy] = useState<SortOption>('lastName');
+  const [sortBy, setSortBy] = useState<SortOption>('last_name');
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  // Sync state with incoming props from parent
   useEffect(() => {
     setStudents(initialStudents);
   }, [initialStudents]);
 
-  // Filtering and Sorting Logic
+  // 3. Logic updated to use snake_case properties
   const displayStudents = useMemo(() => {
     const yearWeight: Record<string, number> = {
       '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4
@@ -48,48 +49,58 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
         const currentProgram = s.program?.trim().toUpperCase() || '';
         const targetFilter = programFilter?.trim().toUpperCase() || 'ALL';
         const matchProgram = targetFilter === 'ALL' || currentProgram === targetFilter;
-        const matchYear = yearFilter === 'ALL' || s.yearLevel === yearFilter;
+        const matchYear = yearFilter === 'ALL' || s.year_level === yearFilter;
         
-        const fullSearch = `${s.firstName} ${s.lastName} ${s.studentId} ${s.email}`.toLowerCase();
+        const fullSearch = `${s.first_name} ${s.last_name} ${s.student_id} ${s.email}`.toLowerCase();
         const matchSearch = fullSearch.includes(searchQuery.toLowerCase().trim());
         
         return matchProgram && matchYear && matchSearch;
       })
       .sort((a, b) => {
-        if (sortBy === 'studentId') return a.studentId - b.studentId;
-        if (sortBy === 'yearLevel') return (yearWeight[a.yearLevel] || 0) - (yearWeight[b.yearLevel] || 0);
-        return a.lastName.localeCompare(b.lastName);
+        if (sortBy === 'student_id') return a.student_id - b.student_id;
+        if (sortBy === 'year_level') return (yearWeight[a.year_level] || 0) - (yearWeight[b.year_level] || 0);
+        return a.last_name.localeCompare(b.last_name);
       });
   }, [students, programFilter, yearFilter, searchQuery, sortBy]);
 
-  // --- SUPABASE ACTIONS ---
+  // --- SUPABASE ACTIONS (NOW WITH LOCAL STATE UPDATES) ---
 
   const handleSave = async (studentData: any) => {
-    // Mapping frontend names to Supabase snake_case columns
-    const dbPayload = {
-      student_id: studentData.studentId || studentData.student_id,
-      first_name: studentData.firstName || studentData.first_name,
-      last_name: studentData.lastName || studentData.last_name,
-      email: studentData.email,
-      year_level: studentData.yearLevel || studentData.year_level,
+    const dbPayload: Student = {
+      student_id: Number(studentData.student_id),
+      first_name: studentData.first_name,
+      last_name: studentData.last_name,
+      email: studentData.email || '',
+      year_level: studentData.year_level,
       program: studentData.program
     };
 
     if (selectedStudent) {
-      // UPDATE existing record
+      // UPDATE logic
       const { error } = await supabase
         .from('students')
         .update(dbPayload)
-        .eq('student_id', selectedStudent.studentId);
+        .eq('student_id', selectedStudent.student_id); 
       
       if (error) return alert("Update failed: " + error.message);
+
+      // Update local state instead of reloading
+      setStudents(prev => 
+        prev.map(s => s.student_id === dbPayload.student_id ? dbPayload : s)
+      );
     } else {
-      // CREATE new record
-      const { error } = await supabase
+      // INSERT logic
+      const { data, error } = await supabase
         .from('students')
-        .insert([dbPayload]);
+        .insert([dbPayload])
+        .select(); // Select is needed to get the new record back
       
       if (error) return alert("Failed to add student: " + error.message);
+
+      // Add new record to local state
+      if (data && data[0]) {
+        setStudents(prev => [...prev, data[0]]);
+      }
     }
 
     setIsModalOpen(false);
@@ -102,7 +113,13 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
         .delete()
         .eq('student_id', id);
 
-      if (error) alert("Delete failed: " + error.message);
+      if (error) {
+        alert("Delete failed: " + error.message);
+      } else {
+        // Remove from local state
+        setStudents(prev => prev.filter(s => s.student_id !== id));
+        setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
+      }
     }
   };
 
@@ -113,8 +130,13 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
         .delete()
         .in('student_id', selectedIds);
 
-      if (error) alert("Bulk delete failed: " + error.message);
-      else setSelectedIds([]);
+      if (error) {
+        alert("Bulk delete failed: " + error.message);
+      } else {
+        // Remove all selected IDs from local state
+        setStudents(prev => prev.filter(s => !selectedIds.includes(s.student_id)));
+        setSelectedIds([]);
+      }
     }
   };
 
@@ -123,14 +145,14 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
     if (selectedIds.length === displayStudents.length && displayStudents.length > 0) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(displayStudents.map(s => s.studentId));
+      setSelectedIds(displayStudents.map(s => s.student_id));
     }
   };
 
   const handleExportCSV = () => {
     if (displayStudents.length === 0) return alert("No data to export");
     const headers = ["Student ID", "Last Name", "First Name", "Email", "Year Level", "Program"];
-    const rows = displayStudents.map(s => [s.studentId, s.lastName, s.firstName, s.email, s.yearLevel, s.program]);
+    const rows = displayStudents.map(s => [s.student_id, s.last_name, s.first_name, s.email, s.year_level, s.program]);
     const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -176,11 +198,6 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
-            {searchQuery && (
-              <button className="search-clear-btn" onClick={() => setSearchQuery('')} title="Clear search">
-                <X size={14} />
-              </button>
-            )}
           </div>
 
           <div className="filter-group">
@@ -197,9 +214,9 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
           <div className="filter-group">
             <ArrowUpDown size={16} className="filter-icon" />
             <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortOption)} className="filter-select">
-              <option value="lastName">Sort: Name (A-Z)</option>
-              <option value="studentId">Sort: ID Number</option>
-              <option value="yearLevel">Sort: Year Level</option>
+              <option value="last_name">Sort: Name (A-Z)</option>
+              <option value="student_id">Sort: ID Number</option>
+              <option value="year_level">Sort: Year Level</option>
             </select>
           </div>
         </div>
@@ -228,30 +245,30 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
           <tbody>
             {displayStudents.length > 0 ? (
               displayStudents.map((s) => (
-                <tr key={s.studentId} className={selectedIds.includes(s.studentId) ? 'row-selected' : ''}>
+                <tr key={s.student_id} className={selectedIds.includes(s.student_id) ? 'row-selected' : ''}>
                   <td>
                     <input 
                       type="checkbox" 
-                      checked={selectedIds.includes(s.studentId)}
+                      checked={selectedIds.includes(s.student_id)}
                       onChange={() => {
                         setSelectedIds(prev => 
-                          prev.includes(s.studentId) ? prev.filter(id => id !== s.studentId) : [...prev, s.studentId]
+                          prev.includes(s.student_id) ? prev.filter(id => id !== s.student_id) : [...prev, s.student_id]
                         );
                       }}
                     />
                   </td>
-                  <td className="font-mono">{s.studentId}</td>
-                  <td className="font-bold">{s.lastName}</td>
-                  <td>{s.firstName}</td>
+                  <td className="font-mono">{s.student_id}</td>
+                  <td className="font-bold">{s.last_name}</td>
+                  <td>{s.first_name}</td>
                   <td className="email-cell">{s.email || '—'}</td>
-                  <td>{s.yearLevel}</td>
+                  <td>{s.year_level}</td>
                   <td><span className="program-tag">{s.program}</span></td>
                   <td>
                     <div className="action-buttons-row">
                       <button className="btn-icon edit" title="Edit" onClick={() => { setSelectedStudent(s); setIsModalOpen(true); }}>
                         <Edit3 size={16} />
                       </button>
-                      <button className="btn-icon delete" title="Delete" onClick={() => handleDelete(s.studentId)}>
+                      <button className="btn-icon delete" title="Delete" onClick={() => handleDelete(s.student_id)}>
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -260,9 +277,7 @@ const StudentRecords = ({ initialStudents, programFilter }: Props) => {
               ))
             ) : (
               <tr>
-                <td colSpan={8} className="empty-state-cell">
-                  No students found matching your filters.
-                </td>
+                <td colSpan={8} className="empty-state-cell">No students found.</td>
               </tr>
             )}
           </tbody>
