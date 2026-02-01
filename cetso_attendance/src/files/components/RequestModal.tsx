@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Calendar, User, FileText, Info, Mail, BookOpen, GraduationCap } from 'lucide-react';
+import { X, Calendar, User, FileText, Info, Mail, BookOpen, GraduationCap, Bell } from 'lucide-react';
 import '../styles/components/requestmodal.css';
 
 interface RequestModalProps {
@@ -54,10 +54,27 @@ const RequestModal: React.FC<RequestModalProps> = ({ request, onClose }) => {
             </div>
           </div>
 
+          {/* Sanction Details Section (Only shows if they exist) */}
+          {request.sanction_details && (
+            <div className="detail-section sanction-info">
+              <label>Current Sanction / Requirements</label>
+              <div className="sanction-box">
+                {request.sanction_details}
+              </div>
+            </div>
+          )}
+
           <div className="modal-footer">
             <div className={`status-badge ${request.status.toLowerCase()}`}>
               {request.status}
             </div>
+            
+            {/* FIXED: Changed 'req' to 'request' to match props */}
+            {request.last_notified_at && (
+              <p className="notified-text">
+                <Bell size={12} /> Last notified: {new Date(request.last_notified_at).toLocaleString()}
+              </p>
+            )}
           </div>
         </div>
       </div>

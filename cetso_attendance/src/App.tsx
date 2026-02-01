@@ -25,6 +25,7 @@ const App = () => {
   const [attendance, setAttendance] = useState<any[]>([]);
   const [dbStudents, setDbStudents] = useState<any[]>([]);
   const navigate = useNavigate();
+  const isDashboard = location.pathname === '/dashboard';
 
   // --- DATA FETCHING ---
   const fetchStudents = async () => {
@@ -139,7 +140,7 @@ const App = () => {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
-      <Footer />
+      {!isDashboard && <Footer />}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, CheckCircle2, AlertCircle, Trash2, XCircle } from 'lucide-react';
+import { X, CheckCircle2, AlertCircle, Trash2, XCircle, Layers } from 'lucide-react';
 import '../styles/components/bulkrequestmodal.css';
 
 interface BulkRequestModalProps {
@@ -16,57 +16,60 @@ const BulkRequestModal: React.FC<BulkRequestModalProps> = ({
   onClose 
 }) => {
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="bulk-card" onClick={(e) => e.stopPropagation()}>
+    <div className="rm-bulk-overlay" onClick={onClose}>
+      <div className="rm-bulk-card" onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div className="bulk-header">
-          <div className="header-content">
-            <div className="icon-badge">
-              <CheckCircle2 size={20} />
+        <div className="rm-bulk-header">
+          <div className="rm-header-main">
+            <div className="rm-icon-badge">
+              <Layers size={22} />
             </div>
-            <div>
+            <div className="rm-header-text">
               <h3>Batch Processing</h3>
               <p>Modifying {selectedCount} student records</p>
             </div>
           </div>
-          <button className="close-minimal" onClick={onClose}>
+          <button className="rm-close-btn" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
 
         {/* Selected List Preview */}
-        <div className="bulk-body">
-          <div className="name-preview-grid">
+        <div className="rm-bulk-body">
+          <label className="rm-section-label">Selected Students</label>
+          <div className="rm-name-grid">
             {selectedNames.map((name, i) => (
-              <div key={i} className="name-pill">
+              <div key={i} className="rm-name-pill">
                 {name}
               </div>
             ))}
           </div>
 
-          {/* Action Cards */}
-          <div className="action-stack">
-            <button onClick={() => onAction('Approved')} className="action-row approve">
-              <div className="action-icon"><CheckCircle2 size={18} /></div>
-              <div className="action-label">
-                <strong>Approve Requests</strong>
-                <span>Set status to approved for all selected</span>
+          {/* Action Stack */}
+          <div className="rm-action-stack">
+            <button onClick={() => onAction('Approved')} className="rm-action-item approve">
+              <div className="rm-action-icon"><CheckCircle2 size={20} /></div>
+              <div className="rm-action-info">
+                <strong>Approve All</strong>
+                <span>Set status to approved for selection</span>
               </div>
             </button>
 
-            <button onClick={() => onAction('Rejected')} className="action-row reject">
-              <div className="action-icon"><XCircle size={18} /></div>
-              <div className="action-label">
-                <strong>Reject Requests</strong>
-                <span>Mark selected as rejected</span>
+            <button onClick={() => onAction('Rejected')} className="rm-action-item reject">
+              <div className="rm-action-icon"><XCircle size={20} /></div>
+              <div className="rm-action-info">
+                <strong>Reject All</strong>
+                <span>Mark selection as rejected</span>
               </div>
             </button>
 
-            <button onClick={() => onAction('Delete')} className="action-row delete">
-              <div className="action-icon"><Trash2 size={18} /></div>
-              <div className="action-label">
-                <strong>Remove Permanently</strong>
+            <div className="rm-divider"><span>Danger Zone</span></div>
+
+            <button onClick={() => onAction('Delete')} className="rm-action-item delete">
+              <div className="rm-action-icon"><Trash2 size={20} /></div>
+              <div className="rm-action-info">
+                <strong>Delete Permanently</strong>
                 <span>This action cannot be undone</span>
               </div>
             </button>
@@ -74,9 +77,9 @@ const BulkRequestModal: React.FC<BulkRequestModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="bulk-footer">
+        <div className="rm-bulk-footer">
           <AlertCircle size={14} />
-          <span>Students will see these updates in their portal immediately.</span>
+          <span>Updates are applied to the database immediately.</span>
         </div>
       </div>
     </div>
