@@ -19,6 +19,8 @@ import '../styles/pages/dashboard.css';
 interface DashboardProps {
   attendance: any[];
   dbStudents: any[];
+  // Add this to match what App.tsx is sending
+  setAttendance: React.Dispatch<React.SetStateAction<any[]>>; 
   onRecordAttendance: (studentId: string, type: string) => Promise<{ 
     success: boolean, 
     msg: string, 
