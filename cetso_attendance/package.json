@@ -13,6 +13,7 @@
     "@emailjs/browser": "^4.4.1",
     "@heroicons/react": "^2.2.0",
     "@supabase/supabase-js": "^2.93.2",
+    "html5-qrcode": "^2.3.8",
     "lucide-react": "^0.563.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
