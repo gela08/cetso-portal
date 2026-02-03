@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  ShieldCheck, 
-  ShieldAlert, 
-  Scan, 
-  Calendar, 
-  Clock, 
-  RotateCcw, 
-  History, 
-  Camera, 
+import {
+  ShieldCheck,
+  ShieldAlert,
+  Scan,
+  Calendar,
+  Clock,
+  RotateCcw,
+  History,
+  Camera,
   Keyboard,
   Send
 } from 'lucide-react';
@@ -15,23 +15,23 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import '../styles/pages/scanner.css';
 
 interface ScannerPageProps {
-  onRecordAttendance: (studentId: string, type: string) => Promise<{ 
-    success: boolean, 
-    msg: string, 
-    student?: any 
+  onRecordAttendance: (studentId: string, type: string) => Promise<{
+    success: boolean,
+    msg: string,
+    student?: any
   }>;
 }
 
 const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
   // State Management
   const [inputId, setInputId] = useState('');
-  const [lastScan, setLastScan] = useState<{status: string, msg: string, student?: any} | null>(null);
+  const [lastScan, setLastScan] = useState<{ status: string, msg: string, student?: any } | null>(null);
   const [recentScans, setRecentScans] = useState<any[]>([]);
-  const [eventMode, setEventMode] = useState('Intramurals'); 
+  const [eventMode, setEventMode] = useState('Intramurals');
   const [sessionTime, setSessionTime] = useState('AM_IN');
   const [isProcessing, setIsProcessing] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
-  
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 1. Automatic Focus Management
@@ -50,21 +50,30 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
 
     if (showCamera) {
       scanner = new Html5QrcodeScanner(
-        "sp-reader", 
-        { fps: 10, qrbox: { width: 250, height: 250 } }, 
+        "sp-reader",
+        {
+          fps: 20, // Higher FPS for faster detection
+          qrbox: { width: 300, height: 150 }, // Wider, shorter box for 1D barcodes
+          aspectRatio: 1.0,
+          // EXPLICITLY ENABLE BARCODE FORMATS
+          formatsToSupport: [
+            0, // Code 128
+            1, // Code 39
+            5, // EAN 8
+            6  // EAN 13
+          ]
+        },
         false
       );
 
       scanner.render(
         (decodedText) => {
+          // Your existing logic
           handleProcessAttendance(decodedText);
-          setShowCamera(false); // Close camera after successful scan
+          setShowCamera(false);
           if (scanner) scanner.clear();
         },
-        (error) => {
-          // Handle scan failure, if needed
-          console.warn(`Scan error: ${error}`);
-        }
+        (error) => { console.warn(`Scan error: ${error}`); }
       );
     }
 
@@ -80,11 +89,11 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
 
     setIsProcessing(true);
     const combinedType = `${eventMode} ${sessionTime}`;
-    
+
     try {
       // Direct Database Sync via parent prop
       const result = await onRecordAttendance(cleanId, combinedType);
-      
+
       const scanResult = {
         status: result.success ? 'success' : 'error',
         msg: result.msg,
@@ -104,7 +113,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
     } catch (err) {
       setLastScan({ status: 'error', msg: 'Database connection failed.' });
     } finally {
-      setInputId(''); 
+      setInputId('');
       setIsProcessing(false);
       // Return focus to input for next hardware scan
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -119,7 +128,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
   return (
     <div className="sp-wrapper">
       <div className="sp-container">
-        
+
         {/* Left Sidebar: Control Panel */}
         <aside className="sp-sidebar">
           <div className="sp-engine-card">
@@ -133,9 +142,9 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
               <label><Calendar size={14} /> Event Context</label>
               <div className="sp-button-group">
                 {['Intramurals', 'Orientation'].map(ev => (
-                  <button 
-                    key={ev} 
-                    className={`sp-toggle ${eventMode === ev ? 'active' : ''}`} 
+                  <button
+                    key={ev}
+                    className={`sp-toggle ${eventMode === ev ? 'active' : ''}`}
                     onClick={() => setEventMode(ev)}
                   >
                     {ev}
@@ -149,9 +158,9 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
               <label><Clock size={14} /> Session Period</label>
               <div className="sp-grid-options">
                 {['AM_IN', 'AM_OUT', 'PM_IN', 'PM_OUT'].map(id => (
-                  <button 
-                    key={id} 
-                    className={`sp-toggle ${sessionTime === id ? 'active' : ''}`} 
+                  <button
+                    key={id}
+                    className={`sp-toggle ${sessionTime === id ? 'active' : ''}`}
                     onClick={() => setSessionTime(id)}
                   >
                     {id.replace('_', ' ')}
@@ -165,12 +174,12 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
               <label><Keyboard size={14} /> Manual ID Entry</label>
               <form onSubmit={onManualSubmit} className="sp-manual-form">
                 <div className={`sp-input-group ${isProcessing ? 'processing' : ''}`}>
-                  <input 
+                  <input
                     ref={inputRef}
-                    type="text" 
-                    value={inputId} 
-                    onChange={(e) => setInputId(e.target.value)} 
-                    placeholder="Scan or type ID..." 
+                    type="text"
+                    value={inputId}
+                    onChange={(e) => setInputId(e.target.value)}
+                    placeholder="Scan or type ID..."
                     autoComplete="off"
                   />
                   <button type="submit" className="sp-submit-btn" disabled={isProcessing}>
@@ -179,7 +188,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
                 </div>
               </form>
 
-              <button 
+              <button
                 className={`sp-camera-btn ${showCamera ? 'active' : ''}`}
                 onClick={() => setShowCamera(!showCamera)}
               >
@@ -193,7 +202,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
           {showCamera && (
             <div id="sp-reader" className="sp-camera-viewfinder"></div>
           )}
-          
+
           {/* Real-time Session Logs */}
           <div className="sp-history-card">
             <div className="sp-history-header">
@@ -225,11 +234,11 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
               <button className="sp-reset-btn" onClick={() => setLastScan(null)}>
                 <RotateCcw size={16} /> Clear
               </button>
-              
+
               <div className="sp-icon-reveal">
                 {lastScan.status === 'success' ? <ShieldCheck size={100} /> : <ShieldAlert size={100} />}
               </div>
-              
+
               <h1 className="sp-title">{lastScan.status === 'success' ? 'Verified' : 'Access Denied'}</h1>
               <p className="sp-message">{lastScan.msg}</p>
 
