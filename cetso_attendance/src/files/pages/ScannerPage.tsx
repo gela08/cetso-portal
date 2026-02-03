@@ -34,7 +34,7 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
   
   // Cooldown to prevent duplicate rapid scans of the same ID
   const lastScannedId = useRef<string | null>(null);
-  const cooldownTimer = useRef<NodeJS.Timeout | null>(null);
+  const cooldownTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 1. Automatic Focus Management for Hardware Scanners
@@ -82,7 +82,11 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
             lastScannedId.current = null;
           }, 3000); 
         },
-        (error) => { /* Silently ignore scanning noise */ }
+        (error) => {
+          // Handle scan errors or ignore them
+            console.warn(`Scan error: ${error}`);
+        }
+
       );
     }
 
