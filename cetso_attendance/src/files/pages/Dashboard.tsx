@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { 
-  LayoutDashboard, Users, Scale, ClipboardList, Menu, X, ChevronRight, 
+  LayoutDashboard, Users, ClipboardList, Menu,
   TrendingUp, Clock, Activity, MessageSquare, QrCode, Zap 
 } from 'lucide-react';
 import { 
@@ -83,7 +83,7 @@ const DashboardHome = ({ students, logs, onLaunchScanner }: { students: any[], l
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie data={programStats} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                  {programStats.map((entry, index) => (
+                  {programStats.map((index:any) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
