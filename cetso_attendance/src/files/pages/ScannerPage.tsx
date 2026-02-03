@@ -61,7 +61,10 @@ const ScannerPage: React.FC<ScannerPageProps> = ({ onRecordAttendance }) => {
           setShowCamera(false); // Close camera after successful scan
           if (scanner) scanner.clear();
         },
-        (error) => { /* Silent error to avoid console spam during scan */ }
+        (error) => {
+          // Handle scan failure, if needed
+          console.warn(`Scan error: ${error}`);
+        }
       );
     }
 
